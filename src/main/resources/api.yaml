@@ -1,0 +1,371 @@
+openapi: 3.0.4
+info:
+  title: Task Manager API
+  description: REST API для управления задачами
+  contact:
+    email: hdnhdxv@gmail.com
+  version: 0.1.0
+tags:
+  - name: Tasks
+    description: Операции с задачами
+  - name: Users
+    description: Управление пользователями
+paths:
+  /tasks:
+    get:
+      tags:
+        - Tasks
+      summary: Получить список задач
+      description: Возвращает список задач с поддержкой пагинации и фильтрации
+      parameters:
+        - name: page
+          in: query
+          description: Номер страницы
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Количество задач на странице
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: status
+          in: query
+          description: Фильтр по статусу
+          schema:
+            type: string
+            enum: [pending, in_progress, completed, cancelled]
+        - name: priority
+          in: query
+          description: Фильтр по приоритету
+          schema:
+            type: string
+            enum: [low, medium, high, critical]
+      responses:
+        '200':
+          description: Успешный запрос
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Task'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    post:
+      tags:
+        - Tasks
+      summary: Создать новую задачу
+      description: Создает новую задачу
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaskRequest'
+      responses:
+        '201':
+          description: Задача успешно создана
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /tasks/{taskId}:
+    get:
+      tags:
+        - Tasks
+      summary: Получить задачу по ID
+      description: Возвращает задачу по ее идентификатору
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          description: ID задачи
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Успешный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    put:
+      tags:
+        - Tasks
+      summary: Обновить задачу
+      description: Полностью обновляет задачу
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          description: ID задачи
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTaskRequest'
+      responses:
+        '200':
+          description: Задача успешно обновлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+    delete:
+      tags:
+        - Tasks
+      summary: Удалить задачу
+      description: Удаляет задачу по идентификатору
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          description: ID задачи
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Задача успешно удалена
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /tasks/{taskId}/status:
+    patch:
+      tags:
+        - Tasks
+      summary: Обновить статус задачи
+      description: Обновляет только статус задачи
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          description: ID задачи
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  type: string
+                  enum: [pending, in_progress, completed, cancelled]
+      responses:
+        '200':
+          description: Статус успешно обновлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+components:
+  schemas:
+    Task:
+      type: object
+      required:
+        - id
+        - title
+        - status
+        - priority
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Уникальный идентификатор задачи
+        title:
+          type: string
+          description: Заголовок задачи
+          maxLength: 255
+        description:
+          type: string
+          description: Подробное описание задачи
+          maxLength: 1000
+        status:
+          type: string
+          enum: [pending, in_progress, completed, cancelled]
+          description: Статус задачи
+        priority:
+          type: string
+          enum: [low, medium, high, critical]
+          description: Приоритет задачи
+        due_date:
+          type: string
+          format: date-time
+          description: Срок выполнения задачи
+        created_at:
+          type: string
+          format: date-time
+          description: Дата создания
+        updated_at:
+          type: string
+          format: date-time
+          description: Дата последнего обновления
+        completed_at:
+          type: string
+          format: date-time
+          description: Дата завершения задачи
+
+    CreateTaskRequest:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          maxLength: 1000
+        priority:
+          type: string
+          enum: [low, medium, high, critical]
+          default: medium
+        due_date:
+          type: string
+          format: date-time
+
+    UpdateTaskRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          maxLength: 1000
+        status:
+          type: string
+          enum: [pending, in_progress, completed, cancelled]
+        priority:
+          type: string
+          enum: [low, medium, high, critical]
+        due_date:
+          type: string
+          format: date-time
+
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+          description: Текущая страница
+        limit:
+          type: integer
+          description: Количество элементов на странице
+        total:
+          type: integer
+          description: Общее количество элементов
+        total_pages:
+          type: integer
+          description: Общее количество страниц
+
+    Error:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Тип ошибки
+        message:
+          type: string
+          description: Сообщение об ошибке
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+
+  responses:
+    BadRequest:
+      description: Неверный запрос
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "bad_request"
+            message: "Неверные параметры запроса"
+
+    NotFound:
+      description: Ресурс не найден
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "not_found"
+            message: "Задача не найдена"
+
+    ValidationError:
+      description: Ошибка валидации
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "validation_error"
+            message: "Ошибка валидации данных"
+            details:
+              - field: "title"
+                message: "Title is required"
+
+    InternalError:
+      description: Внутренняя ошибка сервера
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "internal_error"
+            message: "Внутренняя ошибка сервера"

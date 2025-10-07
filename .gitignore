@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+mvnw
+.gitattributes
+mvnw.cmd
+.mvn
