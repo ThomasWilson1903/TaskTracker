@@ -5,8 +5,18 @@
     <SupportedOSPlatformVersion>13.0</SupportedOSPlatformVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platfrom)'=='Release|AnyCPU'">
+	<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+	<WarningsAsErrors />
+  </PropertyGroup>
+  <PropertyGroup>
+	<AnalysisMode>All</AnalysisMode>
+	<EnableNETAnalyzers>true</EnableNETAnalyzers>
+	<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+	<AnalysisLevel>6.0-all</AnalysisLevel>
+  </PropertyGroup>
 
-  <ItemGroup>
+	<ItemGroup>
     <PackageReference Include="Avalonia.iOS" />
   </ItemGroup>
 
