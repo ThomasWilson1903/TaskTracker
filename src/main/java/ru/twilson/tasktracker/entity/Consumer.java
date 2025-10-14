@@ -51,6 +51,18 @@ public class Consumer {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Consumer consumer = (Consumer) o;
+        return id == consumer.id && Objects.equals(globalId, consumer.globalId) && Objects.equals(username, consumer.username) && Objects.equals(password, consumer.password) && Objects.equals(firstName, consumer.firstName) && Objects.equals(lastName, consumer.lastName) && Objects.equals(tasks, consumer.tasks);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, globalId, username, password, firstName, lastName, tasks);
+    }
+
+    @Override
     public String toString() {
         return "Consumer{" +
                 "id=" + id +
