@@ -40,4 +40,8 @@
     <Folder Include="Services\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TaskTracker\TaskTracker.csproj" />
+  </ItemGroup>
+
 </Project>
