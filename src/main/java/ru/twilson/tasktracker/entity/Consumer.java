@@ -5,11 +5,13 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Setter
 @Getter
 @Entity
 @Builder
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 public class Consumer {
@@ -17,6 +19,7 @@ public class Consumer {
     @Id
     @GeneratedValue
     private long id;
+
     @Column(unique = true, nullable = false)
     private String globalId;
     private String username;
@@ -28,6 +31,9 @@ public class Consumer {
     private List<Task> tasks;
 
     public Consumer addTask(Task task) {
+        if (task == null) {
+            return this;
+        }
         if (this.tasks == null) {
             this.tasks = new ArrayList<>();
         }

@@ -14,6 +14,8 @@ public class Task {
     @Id
     @GeneratedValue
     private long taskId;
+
+    @Column(unique = true, nullable = false)
     private String taskGlobalId;
     private String title;
     private String description;

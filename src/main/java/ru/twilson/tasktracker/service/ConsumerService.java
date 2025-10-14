@@ -14,6 +14,9 @@ public class ConsumerService {
     private final ConsumerRepository consumerRepository;
 
     public Consumer add(Consumer consumer) {
+        if (consumer == null) {
+            throw new NullPointerException("Consumer is null");
+        }
         log.info("Adding consumer {}", consumer);
         return consumerRepository.saveAndFlush(consumer);
     }

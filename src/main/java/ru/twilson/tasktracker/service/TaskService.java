@@ -22,6 +22,9 @@ public class TaskService {
     private final ConsumerRepository consumerRepository;
 
     public List<Task> get(String consumerGlobalId) {
+        if (consumerGlobalId == null) {
+            throw new NullPointerException("consumerGlobalId is null");
+        }
         Optional<Consumer> consumer = consumerRepository.findByGlobalId(consumerGlobalId);
         if (consumer.isEmpty()) {
             Consumer build = Consumer.builder().globalId(consumerGlobalId).build();
@@ -31,19 +34,23 @@ public class TaskService {
     }
 
     public void add(String consumerGlobalId, Task task) {
+        if (consumerGlobalId == null || task == null) {
+            throw new NullPointerException("null");
+        }
+
         Optional<Consumer> consumerOptional = consumerRepository.findByGlobalId(consumerGlobalId);
         task.setTaskGlobalId(UUID.randomUUID().toString());
         task.setCreatedAt(Instant.now().toString());
         task.setUpdatedAt(Instant.now().toString());
         if (consumerOptional.isEmpty()) {
-            Consumer add = consumerService.add(Consumer.builder().globalId(consumerGlobalId).build());
-            task.setConsumer(add);
-            add.addTask(task);
-            consumerRepository.saveAndFlush(add);
+            Consumer consumer = Consumer.builder().globalId(consumerGlobalId).build();
+            task.setConsumer(consumer);
+            consumer.addTask(task);
+            consumerService.add(consumer);
         } else {
             Consumer consumer = consumerOptional.get();
             task.setConsumer(consumer);
-            consumerRepository.saveAndFlush(consumer.addTask(task));
+            consumerService.add(consumer.addTask(task));
         }
     }
 

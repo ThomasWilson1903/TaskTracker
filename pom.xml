@@ -10,7 +10,7 @@
     </parent>
     <groupId>ru.twilson</groupId>
     <artifactId>TaskTracker</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <name>TaskTracker</name>
     <description>TaskTracker</description>
     <url/>
@@ -131,6 +131,32 @@
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.11</version>
+                <configuration>
+                    <excludes>
+                        <exclude>ru/twilson/tasktracker/api/**</exclude>
+                        <exclude>ru/twilson/tasktracker/model/**</exclude>
+                        <exclude>ru/twilson/tasktracker/TaskTrackerApplication**</exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
