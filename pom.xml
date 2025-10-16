@@ -15,16 +15,35 @@
     <description>TaskTracker</description>
     <url/>
     <licenses>
-        <license/>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
     </licenses>
     <developers>
-        <developer/>
+        <developer>
+            <id>Thomas.Wilson</id>
+            <name>Aleksander Biryukov</name>
+            <email>hdnhdxv@gmail.com</email>
+            <url>https://github.com/ThomasWilson1903</url>
+            <organization>Thomas Wilson Company</organization>
+            <organizationUrl>https://twilson.ru/</organizationUrl>
+            <roles>
+                <role>Architect</role>
+                <role>Developer</role>
+            </roles>
+            <timezone>Europe/Moscow</timezone>
+            <properties>
+                <telegram>https://t.me/Thomas_Wilson225</telegram>
+            </properties>
+        </developer>
     </developers>
     <scm>
-        <connection/>
-        <developerConnection/>
-        <tag/>
-        <url/>
+        <connection>scm:git:https://github.com/ThomasWilson1903/TaskTracker.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com:ThomasWilson1903/TaskTracker.git</developerConnection>
+        <tag>HEAD</tag>
+        <url>https://github.com/ThomasWilson1903/TaskTracker.git</url>
     </scm>
     <properties>
         <java.version>17</java.version>
