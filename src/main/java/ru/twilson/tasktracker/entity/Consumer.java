@@ -5,7 +5,6 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Setter
 @Getter
@@ -48,18 +47,6 @@ public class Consumer {
         }
         tasks.removeIf(task -> task.getTaskGlobalId().equals(taskGlobalId));
         return this;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Consumer consumer = (Consumer) o;
-        return id == consumer.id && Objects.equals(globalId, consumer.globalId) && Objects.equals(username, consumer.username) && Objects.equals(password, consumer.password) && Objects.equals(firstName, consumer.firstName) && Objects.equals(lastName, consumer.lastName) && Objects.equals(tasks, consumer.tasks);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, globalId, username, password, firstName, lastName, tasks);
     }
 
     @Override
