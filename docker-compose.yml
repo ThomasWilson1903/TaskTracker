@@ -1,0 +1,28 @@
+services:
+  app:
+    build: .
+    environment:
+      URL_DATA: jdbc:postgresql://postgres:5432/task_tracker
+    ports:
+      - "9090:8080"
+  postgres:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: your_username
+      POSTGRES_PASSWORD: your_password
+      POSTGRES_DB: task_tracker
+    ports:
+      - "5432:5432"
+    #    volumes:
+    #      - pgdata:/var/lib/postgresql/data
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: hdnhdxv@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: adminRoot
+    ports:
+      - "16543:80"
+    depends_on:
+      - postgres
