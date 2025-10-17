@@ -1,0 +1,29 @@
+services:
+  jenkins:
+    image: jenkins/jenkins:2.532-jdk17
+    container_name: jenkins
+    privileged: true
+    user: root
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock    # ← Docker сокет
+      - /usr/bin/docker:/usr/bin/docker              # ← Docker бинарник
+      - /usr/local/bin/docker-compose:/usr/local/bin/docker-compose
+      - /usr/libexec/docker:/usr/libexec/docker
+
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    command:
+      - --httpPort=8080
+    networks:
+      - jenkins-net
+
+volumes:
+  jenkins_home:
+
+networks:
+  jenkins-net:
+    driver: bridge
