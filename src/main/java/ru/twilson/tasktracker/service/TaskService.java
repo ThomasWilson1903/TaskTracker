@@ -27,8 +27,7 @@ public class TaskService {
         }
         Optional<Consumer> consumer = consumerRepository.findByGlobalId(consumerGlobalId);
         if (consumer.isEmpty()) {
-            Consumer build = Consumer.builder().globalId(consumerGlobalId).build();
-            return consumerService.add(build).getTasks();
+            return List.of();// TODO Exception
         } else
             return consumer.get().getTasks();
     }

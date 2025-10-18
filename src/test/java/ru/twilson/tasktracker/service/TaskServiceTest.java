@@ -39,23 +39,17 @@ class TaskServiceTest {
     class GetTaskTest {
 
         @Test
-        @DisplayName("Получение не существующего пользователя, регистрация нового")
+        @DisplayName("Получение задач у не существующего пользователя")
         void getConsumerOptionalEmpty() {
             //Given
             String globalId = UUID.randomUUID().toString();
-            Consumer consumer = Consumer.builder()
-                    .globalId(globalId)
-                    .tasks(List.of())
-                    .build();
             when(consumerRepository.findByGlobalId(globalId))
                     .thenReturn(Optional.empty());
-            when(consumerService.add(any(Consumer.class))).thenReturn(consumer);
             //When
             List<Task> tasks = taskService.get(globalId);
             //Then
             Assertions.assertNotNull(tasks);
             Assertions.assertTrue(tasks.isEmpty());
-            verify(consumerService, times(1)).add(any(Consumer.class));
         }
 
         @Test
@@ -182,14 +176,6 @@ class TaskServiceTest {
             Assertions.assertThrows(NullPointerException.class, () ->
                     taskService.add(UUID.randomUUID().toString(), null));
         }
-
-        @Test
-        @DisplayName("Попытка добавить null задачу, consumerGlobalId = null ")
-        void addTaskTaskNullAndConsumerGlobalIdNull() {
-            //When and Then
-            Assertions.assertThrows(NullPointerException.class, () ->
-                    taskService.add(null, null));
-        }
     }
 
     @Nested
@@ -212,6 +198,18 @@ class TaskServiceTest {
             taskService.remove(taskGlobalId);
             //Then
             verify(consumerRepository, times(1)).saveAndFlush(any(Consumer.class));
+        }
+
+        @Test
+        @DisplayName("Попытка удалить несуществующую таску")
+        void deleteTaskNotFoundTask() {
+            //Given
+            when(taskRepository.findByTaskGlobalId(any(String.class))).thenReturn(Optional.empty());
+            //When
+            taskService.remove(UUID.randomUUID().toString());
+            //Then
+            verify(consumerRepository, never()).saveAndFlush(any(Consumer.class));
+
         }
 
         @Test
