@@ -1,6 +1,15 @@
 pipeline {
     agent any
 
+    parameters {
+        choice(
+            name: 'BRANCH',
+            defaultValue: 'master',
+            description: 'Введите имя ветки'
+            trim: true
+        )
+    }
+
     tools {
         maven 'M3'
     }
@@ -8,7 +17,8 @@ pipeline {
     stages {
         stage('Checkout & Build') {
             steps {
-                git 'https://github.com/ThomasWilson1903/TaskTracker'
+                git branch: "${params.BRANCH}",
+                    url: 'https://github.com/ThomasWilson1903/TaskTracker'
                 sh 'mvn clean package -DskipTests'
             }
         }
