@@ -12,21 +12,25 @@ pipeline {
                 sh 'mvn clean package -DskipTests'
             }
         }
-
-        stage('Docker Build & Run') {
+        stage('Show files') {
             steps {
-                script {
-                    // Собираем образ
-                    sh 'docker build -t my-app .'
-
-                    // Останавливаем старый контейнер
-                    sh 'docker stop my-app || true'
-                    sh 'docker rm my-app || true'
-
-                    // Запускаем новый
-                    sh 'docker run -d -p 9090:8080 --name my-app my-app'
-                }
+                sh 'ls -a'
             }
         }
+//         stage('Docker Build & Run') {
+//             steps {
+//                 script {
+//                     // Собираем образ
+//                     sh 'docker build -t my-app .'
+//
+//                     // Останавливаем старый контейнер
+//                     sh 'docker stop my-app || true'
+//                     sh 'docker rm my-app || true'
+//
+//                     // Запускаем новый
+//                     sh 'docker run -d -p 9090:8080 --name my-app my-app'
+//                 }
+//             }
+//         }
     }
 }
