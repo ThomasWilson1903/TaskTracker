@@ -1,42 +1,32 @@
 pipeline {
     agent any
 
-    environment {
-        DOCKER_IMAGE = 'task-tracker:latest'
+    tools {
+        maven 'M3'
     }
 
     stages {
-        stage('Checkout') {
+        stage('Checkout & Build') {
             steps {
-                git branch: 'master',
-                    url: 'https://github.com/ThomasWilson1903/TaskTracker.git'
+                git 'https://github.com/ThomasWilson1903/TaskTracker'
+                sh 'mvn clean package -DskipTests'
             }
         }
 
-        stage('Build and Test') {
+        stage('Docker Build & Run') {
             steps {
-                sh '''
-                    mvn clean compile
-                    mvn test
-                    mvn package -DskipTests
-                '''
-            }
-        }
+                script {
+                    // Собираем образ
+                    sh 'docker build -t my-app .'
 
-        stage('Deploy') {
-            steps {
-                sh '''
-                    docker stop task-tracker-container || true
-                    docker rm task-tracker-container || true
-                    docker run -d -p 8080:8080 --name task-tracker-container ${DOCKER_IMAGE}
-                '''
-            }
-        }
-    }
+                    // Останавливаем старый контейнер
+                    sh 'docker stop my-app || true'
+                    sh 'docker rm my-app || true'
 
-    post {
-        always {
-            echo 'Pipeline завершен'
+                    // Запускаем новый
+                    sh 'docker run -d -p 8080:8080 --name my-app my-app'
+                }
+            }
         }
     }
 }
