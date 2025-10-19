@@ -1,6 +1,6 @@
 services:
   app:
-    build: .
+    build: ..
     environment:
       URL_DATA: jdbc:postgresql://postgres:5432/task_tracker
     ports:
