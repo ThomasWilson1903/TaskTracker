@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     parameters {
-        choice(
+        string (
             name: 'BRANCH',
             defaultValue: 'master',
             description: 'Введите имя ветки'
