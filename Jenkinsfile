@@ -24,7 +24,7 @@ pipeline {
                     sh 'docker rm my-app || true'
 
                     // Запускаем новый
-                    sh 'docker run -d -p 8080:8080 --name my-app my-app'
+                    sh 'docker run -d -p 9090:8080 --name my-app my-app'
                 }
             }
         }
