@@ -1,46 +1,51 @@
 pipeline {
     agent any
 
-    parameters {
-        string (
-            name: 'BRANCH',
-            defaultValue: 'master',
-            description: 'Введите имя ветки'
-            trim: true
-        )
-    }
-
     tools {
         maven 'M3'
     }
 
     stages {
-        stage('Checkout & Build') {
+        stage('Checkout & Build') { 
             steps {
-                git branch: "${params.BRANCH}",
+                git branch: "jenkins",
                     url: 'https://github.com/ThomasWilson1903/TaskTracker'
                 sh 'mvn clean package -DskipTests'
             }
         }
-        stage('Show files') {
+
+        stage('Docker Build') {
             steps {
-                sh 'ls -a'
+                script {
+                    // Собираем образ
+                    sh 'docker build -t my-app .'
+                }
             }
         }
-//         stage('Docker Build & Run') {
-//             steps {
-//                 script {
-//                     // Собираем образ
-//                     sh 'docker build -t my-app .'
-//
-//                     // Останавливаем старый контейнер
-//                     sh 'docker stop my-app || true'
-//                     sh 'docker rm my-app || true'
-//
-//                     // Запускаем новый
-//                     sh 'docker run -d -p 9090:8080 --name my-app my-app'
-//                 }
-//             }
-//         }
+
+        stage('Docker Compose Deploy') {
+            steps {
+                script {
+                    // Останавливаем и удаляем старые контейнеры
+                    sh 'docker-compose down || true'
+
+                    // Запускаем через docker-compose
+                    sh 'docker-compose up -d'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            // Очистка после выполнения
+            sh 'docker system prune -f || true'
+        }
+        success {
+            echo 'Приложение успешно развернуто через Docker Compose!'
+        }
+        failure {
+            echo 'Произошла ошибка при развертывании'
+        }
     }
 }
