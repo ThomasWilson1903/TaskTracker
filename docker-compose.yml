@@ -1,5 +1,6 @@
 services:
   app:
+    container_name: Task-Tracker
     build: ./
     environment:
       URL_DATA: jdbc:postgresql://postgres:5432/task_tracker
