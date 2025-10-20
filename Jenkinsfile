@@ -28,7 +28,7 @@ pipeline {
                 script {
                     // Останавливаем и удаляем старые контейнеры
                     sh 'docker-compose down || true'
-
+                    sh 'ls -a'
                     // Запускаем через docker-compose
                     sh 'docker-compose up -d'
                 }
