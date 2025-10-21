@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ru.twilson.tasktracker.api.TasksApi;
+import ru.twilson.tasktracker.entity.Task;
 import ru.twilson.tasktracker.model.*;
 import ru.twilson.tasktracker.service.TaskService;
 import ru.twilson.tasktracker.utils.TaskMapper;
@@ -18,7 +19,7 @@ public class TaskApiImpl implements TasksApi {
 
     @Override
     public ResponseEntity<TasksGet200Response> tasksGet(String userId) {
-        return new ResponseEntity<>(new TasksGet200Response().data(mapper.toTaskNotes(service.get(userId))), HttpStatus.OK);
+        return new ResponseEntity<>(new TasksGet200Response().data(mapper.toTaskNotes(service.getTaskByIdConsumer(userId))), HttpStatus.OK);
     }
 
     @Override
@@ -35,12 +36,14 @@ public class TaskApiImpl implements TasksApi {
 
     @Override
     public ResponseEntity<TaskNote> tasksTaskIdGet(String taskId) {
-        return TasksApi.super.tasksTaskIdGet(taskId);
+        return new ResponseEntity<>(mapper.toTaskNote(service.getTaskByIdTask(taskId)), HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<TaskNote> tasksTaskIdPut(String taskId, UpdateTaskRequest updateTaskRequest) {
-        return TasksApi.super.tasksTaskIdPut(taskId, updateTaskRequest);
+        Task task = mapper.toTask(updateTaskRequest);
+        task.setTaskGlobalId(taskId);
+        return new ResponseEntity<>(mapper.toTaskNote(service.update(task)), HttpStatus.OK);
     }
 
 }

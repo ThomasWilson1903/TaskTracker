@@ -1,10 +1,12 @@
 package ru.twilson.tasktracker.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.twilson.tasktracker.entity.Consumer;
 import ru.twilson.tasktracker.entity.Task;
+import ru.twilson.tasktracker.model.UpdateTaskRequest;
 import ru.twilson.tasktracker.repository.ConsumerRepository;
 import ru.twilson.tasktracker.repository.TaskRepository;
 
@@ -21,15 +23,18 @@ public class TaskService {
     private final ConsumerService consumerService;
     private final ConsumerRepository consumerRepository;
 
-    public List<Task> get(String consumerGlobalId) {
+    public Task getTaskByIdTask(String taskId) {
+        return taskRepository.findByTaskGlobalId(taskId).orElseThrow(() -> new EntityNotFoundException("Task not found"));
+    }
+
+    public List<Task> getTaskByIdConsumer(String consumerGlobalId) {
         if (consumerGlobalId == null) {
             throw new NullPointerException("consumerGlobalId is null");
         }
         Optional<Consumer> consumer = consumerRepository.findByGlobalId(consumerGlobalId);
         if (consumer.isEmpty()) {
             return List.of();// TODO Exception
-        } else
-            return consumer.get().getTasks();
+        } else return consumer.get().getTasks();
     }
 
     public void add(String consumerGlobalId, Task task) {
@@ -51,6 +56,22 @@ public class TaskService {
             task.setConsumer(consumer);
             consumerService.add(consumer.addTask(task));
         }
+    }
+
+    @Transactional
+    public Task update(Task task) {
+        Optional<Task> byTaskGlobalId = taskRepository.findByTaskGlobalId(task.getTaskGlobalId());
+        if (byTaskGlobalId.isEmpty()) {
+            throw new EntityNotFoundException("Task not found");
+        }
+        Task taskEntity = byTaskGlobalId.get();
+        taskEntity.setUpdatedAt(Instant.now().toString());
+        taskEntity.setTitle(task.getTitle());
+        taskEntity.setDescription(task.getDescription());
+        taskEntity.setPriority(task.getPriority());
+        taskEntity.setDueDate(task.getDueDate());
+        taskEntity.setCompletedAt(task.getCompletedAt());
+        return taskEntity;
     }
 
     @Transactional

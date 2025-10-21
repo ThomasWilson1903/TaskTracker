@@ -46,7 +46,7 @@ class TaskServiceTest {
             when(consumerRepository.findByGlobalId(globalId))
                     .thenReturn(Optional.empty());
             //When
-            List<Task> tasks = taskService.get(globalId);
+            List<Task> tasks = taskService.getTaskByIdConsumer(globalId);
             //Then
             Assertions.assertNotNull(tasks);
             Assertions.assertTrue(tasks.isEmpty());
@@ -66,7 +66,7 @@ class TaskServiceTest {
                     .build();
             when(consumerRepository.findByGlobalId(globalId)).thenReturn(Optional.of(consumer));
             //When
-            List<Task> tasks = taskService.get(globalId);
+            List<Task> tasks = taskService.getTaskByIdConsumer(globalId);
             //Then
             Assertions.assertEquals(consumer.getTasks().size(), tasks.size());
             Assertions.assertEquals(consumer.getTasks().get(0), task);
@@ -78,14 +78,14 @@ class TaskServiceTest {
             //Given
             when(consumerRepository.findByGlobalId(any())).thenThrow(new RuntimeException());
             //When and Then
-            Assertions.assertThrows(RuntimeException.class, () -> taskService.get(UUID.randomUUID().toString()));
+            Assertions.assertThrows(RuntimeException.class, () -> taskService.getTaskByIdConsumer(UUID.randomUUID().toString()));
         }
 
         @Test
         @DisplayName("Попытка получения задачи по NULL globalID")
         void getTaskNullGlobalId() {
             // When and Then
-            Assertions.assertThrows(NullPointerException.class, () -> taskService.get(null));
+            Assertions.assertThrows(NullPointerException.class, () -> taskService.getTaskByIdConsumer(null));
         }
     }
 

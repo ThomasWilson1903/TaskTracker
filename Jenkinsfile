@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Checkout & Build') { 
             steps {
-                git branch: "jenkins",
+                git branch: "feature/update",
                     url: 'https://github.com/ThomasWilson1903/TaskTracker'
                 sh 'mvn clean package -DskipTests'
             }
