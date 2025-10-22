@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    parameters {
+        string(name: 'BRANCH', defaultValue: 'master', description: 'Git branch to build')
+    }
+
     tools {
         maven 'M3'
     }
@@ -8,7 +12,7 @@ pipeline {
     stages {
         stage('Checkout & Build') { 
             steps {
-                git branch: "feature/update",
+                 git branch: "${params.BRANCH}",
                     url: 'https://github.com/ThomasWilson1903/TaskTracker'
                 sh 'mvn clean package -DskipTests'
             }
@@ -26,11 +30,7 @@ pipeline {
         stage('Docker Compose Deploy') {
             steps {
                 script {
-                    // Останавливаем и удаляем старые контейнеры
-                    sh 'docker-compose down || true'
-                    sh 'ls -a'
-                    // Запускаем через docker-compose
-                    sh 'docker-compose up -d'
+                    sh 'docker-compose up -d --build --force-recreate'
                 }
             }
         }
