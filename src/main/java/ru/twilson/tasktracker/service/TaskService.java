@@ -32,7 +32,7 @@ public class TaskService {
             return consumer.get().getTasks();
     }
 
-    public void add(String consumerGlobalId, Task task) {
+    public Task add(String consumerGlobalId, Task task) { //todo переписать на транзакцию
         if (consumerGlobalId == null || task == null) {
             throw new NullPointerException("null");
         }
@@ -51,6 +51,7 @@ public class TaskService {
             task.setConsumer(consumer);
             consumerService.add(consumer.addTask(task));
         }
+        return task;
     }
 
     @Transactional
