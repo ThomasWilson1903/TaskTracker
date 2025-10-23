@@ -9,7 +9,7 @@ import ru.twilson.tasktracker.repository.ConsumerRepository;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ConsumerService {
+public class ConsumerService {//todo Избавиться
 
     private final ConsumerRepository consumerRepository;
 
