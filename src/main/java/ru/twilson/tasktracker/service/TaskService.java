@@ -68,11 +68,12 @@ public class TaskService {
         }
         Task taskEntity = byTaskGlobalId.get();
         taskEntity.setUpdatedAt(Instant.now().toString());
-        taskEntity.setTitle(task.getTitle());
-        taskEntity.setDescription(task.getDescription());
-        taskEntity.setPriority(task.getPriority());
-        taskEntity.setDueDate(task.getDueDate());
-        taskEntity.setCompletedAt(task.getCompletedAt());
+        taskEntity.setTitle(task.getTitle() == null ? taskEntity.getTitle() : task.getTitle());
+        taskEntity.setDescription(task.getDescription() == null ? taskEntity.getDescription() : task.getDescription());
+        taskEntity.setPriority(task.getPriority() == null ? taskEntity.getPriority() : task.getPriority());
+        taskEntity.setDueDate(task.getDueDate() == null ? taskEntity.getDueDate() : task.getDueDate());
+        taskEntity.setStatus(task.getStatus() == null ? taskEntity.getStatus() : task.getStatus());
+        taskEntity.setCompletedAt(task.getStatus().equals("completed") ? Instant.now().toString() : null);
         return taskEntity;
     }
 
