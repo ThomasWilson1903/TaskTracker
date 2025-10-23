@@ -46,6 +46,7 @@ public class TaskService {
         task.setTaskGlobalId(UUID.randomUUID().toString());
         task.setCreatedAt(Instant.now().toString());
         task.setUpdatedAt(Instant.now().toString());
+        task.setStatus("pending");
         if (consumerOptional.isEmpty()) {
             Consumer consumer = Consumer.builder().globalId(consumerGlobalId).build();
             task.setConsumer(consumer);

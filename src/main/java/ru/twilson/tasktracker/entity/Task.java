@@ -24,6 +24,7 @@ public class Task {
     private String createdAt;
     private String updatedAt;
     private String completedAt;
+    private String status;
 
     @ManyToOne(cascade = CascadeType.ALL)
     private Consumer consumer;
