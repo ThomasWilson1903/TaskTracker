@@ -28,4 +28,8 @@ public class Task {
 
     @ManyToOne(cascade = CascadeType.ALL)
     private Consumer consumer;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    private Consumer executor;
+
 }

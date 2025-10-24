@@ -17,7 +17,36 @@ services:
     networks:
       - veterinary_default
 
-
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    hostname: rabbitmq
+    ports:
+      - "5672:5672"  # AMQP порт
+      - "15672:15672"  # Web-интерфейс управления
+    volumes:
+      - .rabbitmq_data:/var/lib/rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=password
+      - RABBITMQ_DEFAULT_VHOST=/
+      - RABBITMQ_LOGS=-  # Логи идут в stdout (управляется Docker)
+      - RABBITMQ_SASL_LOGS=-
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"  # Максимальный размер файла лога
+        max-file: "3"     # Максимальное количество файлов
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "check_port_connectivity" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
 networks:
   veterinary_default:
     external: true
