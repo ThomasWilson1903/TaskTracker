@@ -25,6 +25,4 @@ public interface TaskMapper {
     TaskNote toTaskNote(Task task);
 
     List<TaskNote> toTaskNotes(List<Task> tasks);
-
-
 }

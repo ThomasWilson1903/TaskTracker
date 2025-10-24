@@ -29,8 +29,7 @@ class TaskServiceTest {
 
     @Mock
     private TaskRepository taskRepository;
-    @Mock
-    private ConsumerService consumerService;
+
     @Mock
     private ConsumerRepository consumerRepository;
 
@@ -105,12 +104,11 @@ class TaskServiceTest {
             Task task = Task.builder()
                     .taskGlobalId(UUID.randomUUID().toString())
                     .build();
-            when(consumerService.add(any(Consumer.class))).thenReturn(consumer);
             when(consumerRepository.findByGlobalId(globalId)).thenReturn(Optional.of(consumer));
             //When
             taskService.add(globalId, task);
             //Then
-            verify(consumerService).add(any(Consumer.class));
+            verify(consumerRepository).save(any(Consumer.class));
         }
 
         @Test
@@ -125,7 +123,7 @@ class TaskServiceTest {
             Task task = Task.builder()
                     .taskGlobalId(UUID.randomUUID().toString())
                     .build();
-            when(consumerService.add(any(Consumer.class))).thenThrow(new RuntimeException());
+            when(consumerRepository.save(any(Consumer.class))).thenThrow(RuntimeException.class);
             when(consumerRepository.findByGlobalId(globalId)).thenReturn(Optional.of(consumer));
             //When and Then
             Assertions.assertThrows(RuntimeException.class, () -> taskService.add(globalId, task));
@@ -153,12 +151,10 @@ class TaskServiceTest {
                     .taskGlobalId(UUID.randomUUID().toString())
                     .build();
             when(consumerRepository.findByGlobalId(globalId)).thenReturn(Optional.empty());
-            when(consumerService.add(any(Consumer.class))).thenReturn(consumer);
             //When
             taskService.add(globalId, task);
 
             //Then
-            verify(consumerService, times(1)).add(any(Consumer.class));
         }
 
         @Test

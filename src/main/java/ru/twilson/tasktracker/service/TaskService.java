@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.twilson.tasktracker.entity.Consumer;
 import ru.twilson.tasktracker.entity.Task;
-import ru.twilson.tasktracker.model.UpdateTaskRequest;
 import ru.twilson.tasktracker.repository.ConsumerRepository;
 import ru.twilson.tasktracker.repository.TaskRepository;
 
@@ -20,7 +19,6 @@ import java.util.UUID;
 public class TaskService {
 
     private final TaskRepository taskRepository;
-    private final ConsumerService consumerService;
     private final ConsumerRepository consumerRepository;
 
     public Task getTaskByIdTask(String taskId) {
@@ -37,7 +35,8 @@ public class TaskService {
         } else return consumer.get().getTasks();
     }
 
-    public Task add(String consumerGlobalId, Task task) { //todo переписать на транзакцию
+    @Transactional
+    public Task add(String consumerGlobalId, Task task) {
         if (consumerGlobalId == null || task == null) {
             throw new NullPointerException("null");
         }
@@ -47,16 +46,17 @@ public class TaskService {
         task.setCreatedAt(Instant.now().toString());
         task.setUpdatedAt(Instant.now().toString());
         task.setStatus("pending");
+        Consumer consumer;
         if (consumerOptional.isEmpty()) {
-            Consumer consumer = Consumer.builder().globalId(consumerGlobalId).build();
+            consumer = Consumer.builder().globalId(consumerGlobalId).build();
             task.setConsumer(consumer);
             consumer.addTask(task);
-            consumerService.add(consumer);
         } else {
-            Consumer consumer = consumerOptional.get();
+            consumer = consumerOptional.get();
             task.setConsumer(consumer);
-            consumerService.add(consumer.addTask(task));
+            consumer.addTask(task);
         }
+        consumerRepository.save(consumer);
         return task;
     }
 
