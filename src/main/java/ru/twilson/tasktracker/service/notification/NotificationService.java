@@ -5,6 +5,8 @@ import lombok.*;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Service;
 
 import static org.springframework.amqp.core.MessageProperties.CONTENT_TYPE_JSON;
@@ -12,6 +14,7 @@ import static ru.twilson.tasktracker.configuration.RabbitMqConfiguration.NOTIFIC
 
 @Service
 @RequiredArgsConstructor
+@ConditionalOnBean(RabbitAutoConfiguration.class)
 public class NotificationService {
 
     private final ObjectMapper objectMapper;

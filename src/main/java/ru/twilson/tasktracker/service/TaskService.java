@@ -9,7 +9,6 @@ import ru.twilson.tasktracker.entity.Consumer;
 import ru.twilson.tasktracker.entity.Task;
 import ru.twilson.tasktracker.repository.ConsumerRepository;
 import ru.twilson.tasktracker.repository.TaskRepository;
-import ru.twilson.tasktracker.service.notification.NotificationService;
 import ru.twilson.tasktracker.utils.TaskFormatterUtils;
 
 import java.time.Instant;
@@ -17,16 +16,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static ru.twilson.tasktracker.utils.TaskFormatterUtils.formatTask;
-
 @Service
 @RequiredArgsConstructor
 public class TaskService {
 
-    private final ObjectMapper objectMapper;//todo del
     private final TaskRepository taskRepository;
     private final ConsumerRepository consumerRepository;
-    private final NotificationService notificationService;
+//    private final NotificationService notificationService;
 
     public Task getTaskByIdTask(String taskId) {
         return taskRepository.findByTaskGlobalId(taskId).orElseThrow(() -> new EntityNotFoundException("Task not found"));
@@ -64,7 +60,7 @@ public class TaskService {
             consumer.addTask(task);
         }
         consumerRepository.save(consumer);
-        notificationService.sendNotification(consumerGlobalId, formatTask(task));
+//        notificationService.sendNotification(consumerGlobalId, formatTask(task));
         return task;
     }
 
@@ -83,7 +79,7 @@ public class TaskService {
         taskEntity.setDueDate(task.getDueDate() == null ? taskEntity.getDueDate() : task.getDueDate());
         taskEntity.setStatus(task.getStatus() == null ? taskEntity.getStatus() : task.getStatus());
         taskEntity.setCompletedAt(task.getStatus().equals("completed") ? Instant.now().toString() : null);
-        notificationService.sendNotification(taskEntity.getConsumer().getGlobalId(), notification);
+//        notificationService.sendNotification(taskEntity.getConsumer().getGlobalId(), notification);
         return taskEntity;
     }
 
@@ -96,7 +92,7 @@ public class TaskService {
         Task task = byTaskGlobalId.get();
         Consumer consumer = task.getConsumer().removeTask(taskGlobalId);
         consumerRepository.saveAndFlush(consumer);
-        notificationService.sendNotification(consumer.getGlobalId(), String.format("Задача была удалена [%s]", task.getTitle()));
+//        notificationService.sendNotification(consumer.getGlobalId(), String.format("Задача была удалена [%s]", task.getTitle()));
     }
 
 
