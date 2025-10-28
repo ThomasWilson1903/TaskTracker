@@ -17,13 +17,13 @@ public class TaskFormatterUtils {
 
         boolean hasChanges = false;
 
-        if (!task.getTitle().equals(order.getTitle())) {
+        if (task.getTitle() != null && !task.getTitle().equals(order.getTitle())) {
             result.append("✏️ Название\n");
             result.append("`").append(task.getTitle()).append("` → `").append(order.getTitle()).append("`\n\n");
             hasChanges = true;
         }
 
-        if (!task.getDescription().equals(order.getDescription())) {
+        if (task.getDescription() != null && !task.getDescription().equals(order.getDescription())) {
             String oldDesc = task.getDescription();
             String newDesc = order.getDescription();
             if (oldDesc.length() > 50) oldDesc = oldDesc.substring(0, 47) + "...";
@@ -33,19 +33,19 @@ public class TaskFormatterUtils {
             hasChanges = true;
         }
 
-        if (!task.getPriority().equals(order.getPriority())) {
+        if (task.getPriority() != null && !task.getPriority().equals(order.getPriority())) {
             result.append("🚨 Приоритет\n");
             result.append("`").append(task.getPriority()).append("` → `").append(order.getPriority()).append("`\n\n");
             hasChanges = true;
         }
 
-        if (!task.getDueDate().equals(order.getDueDate())) {
+        if (task.getDueDate() != null && !task.getDueDate().equals(order.getDueDate())) {
             result.append("📅 Срок выполнения\n");
             result.append("`").append(formatDate(task.getDueDate())).append("` → `").append(formatDate(order.getDueDate())).append("`\n\n");
             hasChanges = true;
         }
 
-        if (!task.getStatus().equals(order.getStatus())) {
+        if (task.getStatus() != null && !task.getStatus().equals(order.getStatus())) {
             result.append("🔄 Статус\n");
             result.append("`").append(task.getStatus()).append("` → `").append(task.getStatus()).append("`\n\n");
             hasChanges = true;

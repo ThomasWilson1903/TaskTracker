@@ -1,6 +1,6 @@
 package ru.twilson.tasktracker.service;
 
-import org.junit.jupiter.api.Assertions;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -13,11 +13,13 @@ import ru.twilson.tasktracker.entity.Task;
 import ru.twilson.tasktracker.repository.ConsumerRepository;
 import ru.twilson.tasktracker.repository.TaskRepository;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -35,7 +37,7 @@ class TaskServiceTest {
 
     @Nested
     @DisplayName("Тестирование получение списка задач")
-    class GetTaskTest {
+    class GetTasksTest {
 
         @Test
         @DisplayName("Получение задач у не существующего пользователя")
@@ -44,11 +46,8 @@ class TaskServiceTest {
             String globalId = UUID.randomUUID().toString();
             when(consumerRepository.findByGlobalId(globalId))
                     .thenReturn(Optional.empty());
-            //When
-            List<Task> tasks = taskService.getTaskByIdConsumer(globalId);
-            //Then
-            Assertions.assertNotNull(tasks);
-            Assertions.assertTrue(tasks.isEmpty());
+            //When and Then
+            assertThrows(EntityNotFoundException.class, () -> taskService.getTaskByIdConsumer(globalId));
         }
 
         @Test
@@ -67,8 +66,8 @@ class TaskServiceTest {
             //When
             List<Task> tasks = taskService.getTaskByIdConsumer(globalId);
             //Then
-            Assertions.assertEquals(consumer.getTasks().size(), tasks.size());
-            Assertions.assertEquals(consumer.getTasks().get(0), task);
+            assertEquals(consumer.getTasks().size(), tasks.size());
+            assertEquals(consumer.getTasks().get(0), task);
         }
 
         @Test
@@ -77,14 +76,14 @@ class TaskServiceTest {
             //Given
             when(consumerRepository.findByGlobalId(any())).thenThrow(new RuntimeException());
             //When and Then
-            Assertions.assertThrows(RuntimeException.class, () -> taskService.getTaskByIdConsumer(UUID.randomUUID().toString()));
+            assertThrows(RuntimeException.class, () -> taskService.getTaskByIdConsumer(UUID.randomUUID().toString()));
         }
 
         @Test
         @DisplayName("Попытка получения задачи по NULL globalID")
         void getTaskNullGlobalId() {
             // When and Then
-            Assertions.assertThrows(NullPointerException.class, () -> taskService.getTaskByIdConsumer(null));
+            assertThrows(NullPointerException.class, () -> taskService.getTaskByIdConsumer(null));
         }
     }
 
@@ -126,7 +125,7 @@ class TaskServiceTest {
             when(consumerRepository.save(any(Consumer.class))).thenThrow(RuntimeException.class);
             when(consumerRepository.findByGlobalId(globalId)).thenReturn(Optional.of(consumer));
             //When and Then
-            Assertions.assertThrows(RuntimeException.class, () -> taskService.add(globalId, task));
+            assertThrows(RuntimeException.class, () -> taskService.add(globalId, task));
         }
 
         @Test
@@ -135,7 +134,7 @@ class TaskServiceTest {
             //Given
             when(consumerRepository.findByGlobalId(any())).thenThrow(new RuntimeException());
             //When and Then
-            Assertions.assertThrows(RuntimeException.class, () -> taskService.add(UUID.randomUUID().toString(), new Task()));
+            assertThrows(RuntimeException.class, () -> taskService.add(UUID.randomUUID().toString(), new Task()));
         }
 
         @Test
@@ -161,7 +160,7 @@ class TaskServiceTest {
         @DisplayName("Попытка добавить задачу, consumerGlobalId = null")
         void addTaskConsumerGlobalIdNull() {
             //When and Then
-            Assertions.assertThrows(NullPointerException.class, () ->
+            assertThrows(NullPointerException.class, () ->
                     taskService.add(null, new Task()));
         }
 
@@ -169,7 +168,7 @@ class TaskServiceTest {
         @DisplayName("Попытка добавить null задачу")
         void addTaskTaskNull() {
             //When and Then
-            Assertions.assertThrows(NullPointerException.class, () ->
+            assertThrows(NullPointerException.class, () ->
                     taskService.add(UUID.randomUUID().toString(), null));
         }
     }
@@ -215,6 +214,128 @@ class TaskServiceTest {
             taskService.remove(null);
             //Then
             verify(consumerRepository, never()).saveAndFlush(any(Consumer.class));
+        }
+    }
+
+    @Nested
+    @DisplayName("Тестирование получении задачи")
+    class GetTaskTest {
+
+        @Test
+        @DisplayName("Получении задачи по id")
+        public void getTask() {
+            //Given
+            String globalId = UUID.randomUUID().toString();
+            Task task = Task.builder()
+                    .taskGlobalId(globalId)
+                    .build();
+            when(taskRepository.findByTaskGlobalId(any(String.class))).thenReturn(Optional.of(task));
+            //When
+            Task taskResult = taskService.getTaskByIdTask(globalId);
+            //Then
+            assertEquals(task, taskResult);
+        }
+
+        @Test
+        @DisplayName("При получении задачи по id, задача не была найдена")
+        public void getTaskNullTask() {
+            //Given
+            String globalId = UUID.randomUUID().toString();
+            when(taskRepository.findByTaskGlobalId(any(String.class))).thenReturn(Optional.empty());
+            //When and Then
+            assertThrows(EntityNotFoundException.class, () -> taskService.getTaskByIdTask(globalId));
+        }
+    }
+
+    @Nested
+    @DisplayName("Тестирование изменение задачи задачи")
+    class UpdateTaskTest {
+
+        @Test
+        @DisplayName("Изменение задачи")
+        public void updateTask() {
+            //Given
+            String globalId = UUID.randomUUID().toString();
+            Task taskUpdate = Task.builder()
+                    .taskGlobalId(globalId)
+                    .build();
+            when(taskRepository.findByTaskGlobalId(any(String.class)))
+                    .thenReturn(Optional.of(Task.builder().taskGlobalId(globalId).build()));
+            //When
+            Task taskResult = taskService.update(taskUpdate);
+            //Then
+            assertEquals(taskUpdate.getTaskGlobalId(), taskResult.getTaskGlobalId());
+            assertEquals(taskUpdate.getTitle(), taskResult.getTitle());
+            assertEquals(taskUpdate.getDescription(), taskResult.getDescription());
+            assertEquals(taskUpdate.getPriority(), taskResult.getPriority());
+            assertEquals(taskUpdate.getDueDate(), taskResult.getDueDate());
+            assertEquals(taskUpdate.getCreatedAt(), taskResult.getCreatedAt());
+            assertEquals(taskUpdate.getStatus(), taskResult.getStatus());
+        }
+
+        @Test
+        @DisplayName("Изменение всей задачи")
+        public void updateTaskAllFile() {
+            //Given
+            String globalId = UUID.randomUUID().toString();
+            Task taskUpdate = Task.builder()
+                    .taskGlobalId(globalId)
+                    .title("title")
+                    .description("description")
+                    .priority("low")
+                    .dueDate(Instant.now().toString())
+                    .createdAt(Instant.now().toString())
+                    .status("pending")
+                    .build();
+            when(taskRepository.findByTaskGlobalId(any(String.class)))
+                    .thenReturn(Optional.of(Task.builder().taskGlobalId(globalId).build()));
+            //When
+            Task taskResult = taskService.update(taskUpdate);
+            //Then
+            assertNull(taskResult.getCompletedAt());
+            assertEquals(taskUpdate.getTaskGlobalId(), taskResult.getTaskGlobalId());
+            assertEquals(taskUpdate.getTitle(), taskResult.getTitle());
+            assertEquals(taskUpdate.getDescription(), taskResult.getDescription());
+            assertEquals(taskUpdate.getPriority(), taskResult.getPriority());
+            assertEquals(taskUpdate.getDueDate(), taskResult.getDueDate());
+            assertEquals(taskUpdate.getCreatedAt(), taskResult.getCreatedAt());
+            assertEquals(taskUpdate.getStatus(), taskResult.getStatus());
+        }
+
+        @Test
+        @DisplayName("Изменение статуса на выполнено")
+        public void updateTaskSetCompleted() {
+            //Given
+            String globalId = UUID.randomUUID().toString();
+            Task taskUpdate = Task.builder()
+                    .taskGlobalId(globalId)
+                    .title("1234")
+                    .description("1234")
+                    .status("completed")
+                    .build();
+            when(taskRepository.findByTaskGlobalId(any(String.class)))
+                    .thenReturn(Optional.of(Task.builder().taskGlobalId(globalId).build()));
+            //When
+            Task taskResult = taskService.update(taskUpdate);
+            //Then
+            assertNotNull(taskResult.getCompletedAt());
+            assertEquals(taskUpdate.getTaskGlobalId(), taskResult.getTaskGlobalId());
+            assertEquals(taskUpdate.getTitle(), taskResult.getTitle());
+            assertEquals(taskUpdate.getDescription(), taskResult.getDescription());
+            assertEquals(taskUpdate.getPriority(), taskResult.getPriority());
+            assertEquals(taskUpdate.getDueDate(), taskResult.getDueDate());
+            assertEquals(taskUpdate.getCreatedAt(), taskResult.getCreatedAt());
+            assertEquals(taskUpdate.getStatus(), taskResult.getStatus());
+        }
+
+        @Test
+        @DisplayName("Задача не была найдена")
+        public void updateTaskErrorNullTask() {
+            //Given
+            when(taskRepository.findByTaskGlobalId(any(String.class))).thenReturn(Optional.empty());
+            //When and Then
+            assertThrows(EntityNotFoundException.class, () ->
+                    taskService.update(Task.builder().taskGlobalId(UUID.randomUUID().toString()).build()));
         }
     }
 }

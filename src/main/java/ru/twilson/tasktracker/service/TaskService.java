@@ -1,6 +1,5 @@
 package ru.twilson.tasktracker.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.*;
@@ -28,22 +27,22 @@ public class TaskService {
         return taskRepository.findByTaskGlobalId(taskId).orElseThrow(() -> new EntityNotFoundException("Task not found"));
     }
 
+    @Transactional
     public List<Task> getTaskByIdConsumer(String consumerGlobalId) {
         if (consumerGlobalId == null) {
             throw new NullPointerException("consumerGlobalId is null");
         }
-        Optional<Consumer> consumer = consumerRepository.findByGlobalId(consumerGlobalId);
-        if (consumer.isEmpty()) {
-            return List.of();// TODO Exception
-        } else return consumer.get().getTasks();
+        Consumer consumer = consumerRepository.findByGlobalId(
+                consumerGlobalId).orElseThrow(() -> new EntityNotFoundException("Consumer not found"));
+        return consumer.getTasks().stream().map(Task::copy).toList();
     }
 
     @Transactional
-    public Task add(String consumerGlobalId, Task task) {
-        if (consumerGlobalId == null || task == null) {
+    public Task add(String consumerGlobalId, Task taskTemplate) {
+        if (consumerGlobalId == null || taskTemplate == null) {
             throw new NullPointerException("null");
         }
-
+        Task task = taskTemplate.copy();
         Optional<Consumer> consumerOptional = consumerRepository.findByGlobalId(consumerGlobalId);
         task.setTaskGlobalId(UUID.randomUUID().toString());
         task.setCreatedAt(Instant.now().toString());
@@ -66,11 +65,8 @@ public class TaskService {
 
     @Transactional
     public Task update(Task task) {
-        Optional<Task> byTaskGlobalId = taskRepository.findByTaskGlobalId(task.getTaskGlobalId());
-        if (byTaskGlobalId.isEmpty()) {
-            throw new EntityNotFoundException("Task not found");
-        }
-        Task taskEntity = byTaskGlobalId.get();
+        Task taskEntity = taskRepository.findByTaskGlobalId(task.getTaskGlobalId()).orElseThrow(() ->
+                new EntityNotFoundException("Task not found"));
         String notification = TaskFormatterUtils.update(taskEntity, task);
         taskEntity.setUpdatedAt(Instant.now().toString());
         taskEntity.setTitle(task.getTitle() == null ? taskEntity.getTitle() : task.getTitle());
@@ -78,9 +74,10 @@ public class TaskService {
         taskEntity.setPriority(task.getPriority() == null ? taskEntity.getPriority() : task.getPriority());
         taskEntity.setDueDate(task.getDueDate() == null ? taskEntity.getDueDate() : task.getDueDate());
         taskEntity.setStatus(task.getStatus() == null ? taskEntity.getStatus() : task.getStatus());
-        taskEntity.setCompletedAt(task.getStatus().equals("completed") ? Instant.now().toString() : null);
+        taskEntity.setCreatedAt(task.getCreatedAt() == null ? taskEntity.getCreatedAt() : task.getCreatedAt());
+        taskEntity.setCompletedAt("completed".equals(task.getStatus()) ? Instant.now().toString() : null);
 //        notificationService.sendNotification(taskEntity.getConsumer().getGlobalId(), notification);
-        return taskEntity;
+        return taskEntity.copy();
     }
 
     @Transactional
@@ -94,6 +91,4 @@ public class TaskService {
         consumerRepository.saveAndFlush(consumer);
 //        notificationService.sendNotification(consumer.getGlobalId(), String.format("Задача была удалена [%s]", task.getTitle()));
     }
-
-
 }
