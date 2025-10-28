@@ -19,7 +19,7 @@ public class UserRepository
     public async Task Create(User user)
     {
         Users.Add(user);
-        await _context.SendData("/user", user).ConfigureAwait(false);
+        await _context.Post("/user", user).ConfigureAwait(false);
     }
 
     public void Delete(User user)
