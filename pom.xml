@@ -6,30 +6,67 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.5.6</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath/>
     </parent>
     <groupId>ru.twilson</groupId>
     <artifactId>TaskTracker</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <name>TaskTracker</name>
     <description>TaskTracker</description>
     <url/>
     <licenses>
-        <license/>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
     </licenses>
     <developers>
-        <developer/>
+        <developer>
+            <id>Thomas.Wilson</id>
+            <name>Aleksander Biryukov</name>
+            <email>hdnhdxv@gmail.com</email>
+            <url>https://github.com/ThomasWilson1903</url>
+            <organization>Thomas Wilson Company</organization>
+            <organizationUrl>https://twilson.ru/</organizationUrl>
+            <roles>
+                <role>Architect</role>
+                <role>Developer</role>
+            </roles>
+            <timezone>Europe/Moscow</timezone>
+            <properties>
+                <telegram>https://t.me/Thomas_Wilson225</telegram>
+            </properties>
+        </developer>
     </developers>
     <scm>
-        <connection/>
-        <developerConnection/>
-        <tag/>
-        <url/>
+        <connection>scm:git:https://github.com/ThomasWilson1903/TaskTracker.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com:ThomasWilson1903/TaskTracker.git</developerConnection>
+        <tag>HEAD</tag>
+        <url>https://github.com/ThomasWilson1903/TaskTracker.git</url>
     </scm>
     <properties>
         <java.version>17</java.version>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>1.6.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.30</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
         <!-- Bean Validation -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -56,21 +93,32 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <optional>true</optional>
-        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
         <plugins>
+            <!-- Spring Boot Maven Plugin -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>3.5.6</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
@@ -85,11 +133,14 @@
                             <generatorName>spring</generatorName>
                             <modelPackage>ru.twilson.tasktracker.model</modelPackage>
                             <apiPackage>ru.twilson.tasktracker.api</apiPackage>
+                            <invokerPackage>ru.twilson.tasktracker.invoker</invokerPackage>
                             <configOptions>
                                 <interfaceOnly>true</interfaceOnly>
                                 <useSpringBoot3>true</useSpringBoot3>
                                 <useTags>true</useTags>
                                 <openApiNullable>false</openApiNullable>
+                                <basePackage>ru.twilson.tasktracker</basePackage>
+                                <configPackage>ru.twilson.tasktracker.config</configPackage>
                             </configOptions>
                             <output>${project.build.directory}/generated-sources/openapi</output>
                         </configuration>
@@ -100,25 +151,51 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
+                    <source>17</source>
+                    <target>17</target>
                     <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>1.6.3</version>
+                        </path>
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
+                        </path>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok-mapstruct-binding</artifactId>
+                            <version>0.2.0</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.11</version>
                 <configuration>
                     <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
+                        <exclude>ru/twilson/tasktracker/api/**</exclude>
+                        <exclude>ru/twilson/tasktracker/model/**</exclude>
+                        <exclude>ru/twilson/tasktracker/TaskTrackerApplication**</exclude>
                     </excludes>
                 </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

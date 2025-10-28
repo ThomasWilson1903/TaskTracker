@@ -1,0 +1,23 @@
+services:
+  app:
+    container_name: Task-Tracker
+    build: ./
+    environment:
+      URL_DATA: jdbc:postgresql://postgres:5432/task_tracker
+    ports:
+      - "9090:8080"
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: '1024M'
+        reservations:
+          cpus: 0.5
+          memory: '512M'
+    networks:
+      - veterinary_default
+
+
+networks:
+  veterinary_default:
+    external: true
