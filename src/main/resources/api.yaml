@@ -18,9 +18,9 @@ paths:
       summary: Получить список задач
       description: Возвращает список задач с поддержкой пагинации и фильтрации
       parameters:
-        - name: userId
+        - name: user_id
           in: query
-          description: user Id
+          description: user_id
           schema:
             type: string
       responses:
@@ -63,14 +63,14 @@ paths:
         '422':
           $ref: '#/components/responses/ValidationError'
 
-  /tasks/{taskId}:
+  /tasks/{task_id}:
     get:
       tags:
         - Tasks
       summary: Получить задачу по ID
       description: Возвращает задачу по ее идентификатору
       parameters:
-        - name: taskId
+        - name: task_id
           in: path
           required: true
           description: ID задачи
@@ -94,7 +94,7 @@ paths:
       summary: Обновить задачу
       description: Полностью обновляет задачу
       parameters:
-        - name: taskId
+        - name: task_id
           in: path
           required: true
           description: ID задачи
@@ -124,7 +124,7 @@ paths:
       summary: Удалить задачу
       description: Удаляет задачу по идентификатору
       parameters:
-        - name: taskId
+        - name: task_id
           in: path
           required: true
           description: ID задачи
@@ -181,9 +181,9 @@ components:
       type: object
       required:
         - title
-        - userId
+        - user_id
       properties:
-        userId:
+        user_id:
           type: string
           maxLength: 255
         title:
