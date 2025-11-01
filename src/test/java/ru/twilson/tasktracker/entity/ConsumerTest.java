@@ -1,8 +1,8 @@
 package ru.twilson.tasktracker.entity;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -164,7 +164,7 @@ class ConsumerTest {
         }
 
         @Test
-        @DisplayName("Попытка удалить в пустом  списке")
+        @DisplayName("Попытка удалить в пустом списке")
         void removeTaskEmptyList() {
             //Given
             Consumer consumer = Consumer.builder()
