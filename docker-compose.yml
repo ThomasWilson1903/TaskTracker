@@ -17,7 +17,6 @@ services:
     networks:
       - veterinary_default
 
-
 networks:
   veterinary_default:
     external: true

@@ -37,7 +37,7 @@ class TaskMapperImplTest {
     @Test
     @DisplayName("Мапинг dto(null) -> entity ")
     void toTaskNull() {
-        Task task = taskMapper.toTask(null);
+        Task task = taskMapper.toTask((CreateTaskRequest) null);
         Assertions.assertNull(task);
     }
 
