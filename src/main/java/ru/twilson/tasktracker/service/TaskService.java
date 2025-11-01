@@ -1,9 +1,12 @@
 package ru.twilson.tasktracker.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import lombok.*;
 import org.springframework.stereotype.Service;
+import lombok.*;
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.context.ApplicationEventPublisher;
+import ru.twilson.tasktracker.configuration.EventNotification;
+
 import ru.twilson.tasktracker.entity.Consumer;
 import ru.twilson.tasktracker.entity.Task;
 import ru.twilson.tasktracker.repository.ConsumerRepository;
@@ -15,13 +18,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static ru.twilson.tasktracker.utils.TaskFormatterUtils.formatTask;
+
 @Service
 @RequiredArgsConstructor
 public class TaskService {
 
     private final TaskRepository taskRepository;
     private final ConsumerRepository consumerRepository;
-//    private final NotificationService notificationService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public Task getTaskByIdTask(String taskId) {
         return taskRepository.findByTaskGlobalId(taskId).orElseThrow(() -> new EntityNotFoundException("Task not found"));
@@ -59,7 +64,7 @@ public class TaskService {
             consumer.addTask(task);
         }
         consumerRepository.save(consumer);
-//        notificationService.sendNotification(consumerGlobalId, formatTask(task));
+        applicationEventPublisher.publishEvent(new EventNotification(this, consumerGlobalId, formatTask(task)));
         return task;
     }
 
@@ -75,20 +80,20 @@ public class TaskService {
         taskEntity.setDueDate(task.getDueDate() == null ? taskEntity.getDueDate() : task.getDueDate());
         taskEntity.setStatus(task.getStatus() == null ? taskEntity.getStatus() : task.getStatus());
         taskEntity.setCreatedAt(task.getCreatedAt() == null ? taskEntity.getCreatedAt() : task.getCreatedAt());
+        taskEntity.setConsumer(task.getConsumer() == null ? taskEntity.getConsumer() : task.getConsumer());
         taskEntity.setCompletedAt("completed".equals(task.getStatus()) ? Instant.now().toString() : null);
-//        notificationService.sendNotification(taskEntity.getConsumer().getGlobalId(), notification);
+        applicationEventPublisher.publishEvent(new EventNotification(this, taskEntity.getConsumer().getGlobalId(), notification));
         return taskEntity.copy();
     }
 
     @Transactional
     public void remove(String taskGlobalId) {
+        if (taskGlobalId == null) return;
         Optional<Task> byTaskGlobalId = taskRepository.findByTaskGlobalId(taskGlobalId);
-        if (byTaskGlobalId.isEmpty()) {
-            return;
-        }
+        if (byTaskGlobalId.isEmpty()) return;
         Task task = byTaskGlobalId.get();
         Consumer consumer = task.getConsumer().removeTask(taskGlobalId);
         consumerRepository.saveAndFlush(consumer);
-//        notificationService.sendNotification(consumer.getGlobalId(), String.format("Задача была удалена [%s]", task.getTitle()));
+        applicationEventPublisher.publishEvent(new EventNotification(this, consumer.getGlobalId(), String.format("Задача была удалена [%s]", task.getTitle())));
     }
 }

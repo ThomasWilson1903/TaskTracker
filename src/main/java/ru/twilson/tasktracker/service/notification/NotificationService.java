@@ -7,7 +7,9 @@ import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
+import ru.twilson.tasktracker.configuration.EventNotification;
 
 import static org.springframework.amqp.core.MessageProperties.CONTENT_TYPE_JSON;
 import static ru.twilson.tasktracker.configuration.RabbitMqConfiguration.NOTIFICATION_QUEUE;
@@ -21,11 +23,12 @@ public class NotificationService {
     private final RabbitTemplate rabbitTemplate;
 
     @SneakyThrows
-    public void sendNotification(String id, String title) {
+    @EventListener(EventNotification.class)
+    public void sendNotification(EventNotification event) {
         Message message = MessageBuilder
                 .withBody(objectMapper.writeValueAsString(new Notification(
-                        Integer.parseInt(id),
-                        title
+                        Integer.parseInt(event.getId()),
+                        event.getTitle()
                 )).getBytes())
                 .setContentType(CONTENT_TYPE_JSON)
                 .build();
