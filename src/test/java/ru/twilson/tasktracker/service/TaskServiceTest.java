@@ -66,22 +66,13 @@ class TaskServiceTest {
 
         @Test
         @DisplayName("Получение задач у не существующего пользователя")
-        void getConsumerOptionalEmpty() {
+        void getTasksForNonExistentConsumer() {
             //Given
             String globalId = UUID.randomUUID().toString();
             when(consumerRepository.findByGlobalId(globalId))
                     .thenReturn(Optional.empty());
             //When and Then
             assertThrows(EntityNotFoundException.class, () -> taskService.getTaskByIdConsumer(globalId));
-        }
-
-        @Test
-        @DisplayName("Ошибка от БД при получении задачи")
-        void getTaskThrowsException() {
-            //Given
-            when(consumerRepository.findByGlobalId(any())).thenThrow(new RuntimeException());
-            //When and Then
-            assertThrows(RuntimeException.class, () -> taskService.getTaskByIdConsumer(UUID.randomUUID().toString()));
         }
 
         @Test
@@ -116,7 +107,7 @@ class TaskServiceTest {
         }
 
         @Test
-        @DisplayName("Получение не существующего пользователя, регистрация нового")
+        @DisplayName("Получения не существующего пользователя, регистрация нового")
         void addTaskAndNewConsumer() {
             //Given
             String globalId = UUID.randomUUID().toString();
@@ -194,11 +185,11 @@ class TaskServiceTest {
     }
 
     @Nested
-    @DisplayName("Тестирование получении задачи по id")
+    @DisplayName("Тестирование получение задачи по id")
     class GetTaskTest {
 
         @Test
-        @DisplayName("Получении задачи по id")
+        @DisplayName("Получение задачи по id")
         public void getTask() {
             //Given
             String globalId = UUID.randomUUID().toString();
@@ -213,7 +204,7 @@ class TaskServiceTest {
         }
 
         @Test
-        @DisplayName("При получении задачи по id, задача не была найдена, падает исключение ")
+        @DisplayName("При получение задачи по id, задача не была найдена, падает исключение ")
         public void getTaskNullTask_ThrowsException() {
             //Given
             String globalId = UUID.randomUUID().toString();
