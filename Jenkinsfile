@@ -3,135 +3,107 @@ pipeline {
         label 'docker'
     }
 
-    parameters {
-        string(name: 'BRANCH', defaultValue: 'master', description: 'Git branch to build')
+    environment {
+        // Docker
+        DOCKER_REGISTRY = 'docker.io'
+        DOCKER_IMAGE_NAME = 'thomaswilson1903/tasktracker'
+        DOCKER_TAG = "${env.BUILD_NUMBER}"
+
+        // Kubernetes
+        K8S_NAMESPACE = 'default'
+        K8S_DEPLOYMENT = 'my-app-deployment'
     }
 
     tools {
         maven 'M3'
     }
 
-    environment {
-        DOCKER_IMAGE_NAME = 'task-tracker'
-        DOCKER_IMAGE_TAG = "${env.BUILD_NUMBER}"
-    }
-
-
     stages {
-        stage('Tools Verification') {
+        stage('Checkout') {
             steps {
                 script {
-                    echo "🔧 Проверка доступности инструментов на агенте: ${env.NODE_NAME}"
-
-                    // Проверка Java
-                    sh '''
-                        echo "=== Java ==="
-                        java -version
-                        echo "JAVA_HOME: ${JAVA_HOME}"
-                    '''
-
-                    // Проверка Maven
-                    sh '''
-                        echo "=== Maven ==="
-                        mvn --version
-                        which mvn
-                    '''
-
-                    // Проверка Git
-                    sh '''
-                        echo "=== Git ==="
-                        git --version
-                        which git
-                    '''
-
-                    // Проверка Docker
-                    sh '''
-                        echo "=== Docker ==="
-                        docker --version
-                        which docker
-                        echo "Проверка Docker daemon..."
-                        docker ps > /dev/null && echo "✅ Docker daemon доступен" || echo "❌ Docker daemon недоступен"
-                    '''
-
-                    // Проверка Docker Compose
-                    sh '''
-                        echo "=== Docker Compose ==="
-                        docker-compose --version
-                        which docker-compose
-                    '''
-
-                    // Проверка дискового пространства
-                    sh '''
-                        echo "=== Дисковое пространство ==="
-                        df -h
-                    '''
-
-                    // Проверка текущего пользователя и прав
-                    sh '''
-                        echo "=== Пользователь и права ==="
-                        whoami
-                        id
-                        pwd
-                        echo "Права на Docker socket:"
-                        ls -la /var/run/docker.sock 2>/dev/null || echo "Docker socket не найден"
-                    '''
-                }
-            }
-        }
-        stage('Checkout & Build') {
-            steps {
-                git branch: "${params.BRANCH}",
-                   url: 'https://github.com/ThomasWilson1903/TaskTracker'
-                sh 'mvn clean package -DskipTests'
-            }
-        }
-
-        stage('Docker Build') {
-            steps {
-                script {
-                    sh "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
-                    sh "docker tag ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ${DOCKER_IMAGE_NAME}:latest"
+                    checkout scm
                 }
             }
         }
 
-        stage('Docker Compose Deploy') {
+        stage('Build with Maven') {
             steps {
                 script {
-                    sh '''
-                        docker-compose down || true
-                        docker-compose up -d --build --force-recreate
-                    '''
+                    echo 'Building project with Maven...'
+                    sh 'mvn clean compile -B'
                 }
             }
         }
 
-        stage('Health Check') {
+        stage('Run Tests') {
             steps {
                 script {
-                    sleep time: 120, unit: 'SECONDS'
-                    sh 'curl -f http://twilson.ru:8080/actuator/health || echo "Application health check failed but continuing..."'
+                    echo 'Running tests...'
+                    sh 'mvn test -B'
+                }
+            }
+
+            post {
+                always {
+                    junit 'target/surefire-reports/*.xml'
+                }
+            }
+        }
+
+        stage('Package') {
+            steps {
+                script {
+                    echo 'Packaging application...'
+                    sh 'mvn package -DskipTests -B'
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    echo 'Building Docker image...'
+                    sh """
+                        docker build -t ${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${DOCKER_TAG} .
+                        docker tag ${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${DOCKER_TAG} ${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:latest
+                    """
+                }
+            }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(
+                            credentialsId: 'docker-hub-creds',
+                            usernameVariable: 'DOCKER_USER',
+                            passwordVariable: 'DOCKER_PASSWORD'
+                    )]) {
+                        sh """
+                    docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+                    docker push ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}
+                    docker push ${DOCKER_IMAGE_NAME}:latest
+                    docker logout
+                """
+                    }
                 }
             }
         }
     }
 
     post {
-        always {
-            sh '''
-                docker system prune -f || true
-                docker volume prune -f || true
-            '''
-        }
         success {
-            echo "✅ Приложение успешно развернуто! Image: ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
+            echo 'Pipeline completed successfully!'
+            // Можно добавить уведомления
         }
         failure {
-            echo '❌ Произошла ошибка при развертывании'
-            sh '''
-                docker ps -a
-                docker-compose logs || true
-            '''
+            echo 'Pipeline failed!'
+            // Можно добавить уведомления об ошибке
+        }
+        always {
+            echo 'Cleaning up workspace...'
+            cleanWs()
         }
     }
 }
