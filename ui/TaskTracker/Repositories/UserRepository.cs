@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
 using TaskTracker.Models;
 using TaskTracker.Services;
 
@@ -16,7 +15,7 @@ public class UserRepository
         _context = context;
     }
 
-    public async Task Create(User user)
+    public async System.Threading.Tasks.Task Create(User user)
     {
         Users.Add(user);
         await _context.Post("/user", user).ConfigureAwait(false);

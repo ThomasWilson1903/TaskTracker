@@ -9,7 +9,7 @@ public class UserRepositoryTests
     private FakeToBackSender _backSender = new FakeToBackSender();
 
     [Fact]
-    public async Task RepositorySavesUserAfterAdd()
+    public async System.Threading.Tasks.Task RepositorySavesUserAfterAdd()
     {
         var repository = new UserRepository(_backSender);
         var user = new User();
@@ -20,7 +20,7 @@ public class UserRepositoryTests
     }
 
     [Fact]
-    public async Task RepositorySendDataAfterAdd()
+    public async System.Threading.Tasks.Task RepositorySendDataAfterAdd()
     {
         var repository = new UserRepository(_backSender);
         var user = new User();
