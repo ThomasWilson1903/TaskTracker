@@ -1,33 +1,31 @@
 # TaskTracker
 
-Нужно ли он тебе, решаешь только ты
-
+    Решение об использовании сервиса принимаете только вы.
 
 # Запуск приложения
 
 ## Docker Compose
 
-Сборка и запуск:
-```bash
-  docker-compose up --build
-```
+Для запуска в фоновом режиме выполните:
 
-Или для фонового режима:
 ```bash
   docker-compose up -d --build
 ```
 
-Просмотр логов:
-```bash
-  docker-compose logs
-```
+Для остановки приложения:
 
-Остановка:
 ```bash
   docker-compose down
 ```
 
-Остановка с удалением volumes:
+Для остановки с удалением томов (volumes):
+
 ```bash
   docker-compose down -v
 ```
+
+# Документация API (Swagger)
+
+Документация доступна по адресу:
+
+http://localhost:8081/swagger-ui/index.html
