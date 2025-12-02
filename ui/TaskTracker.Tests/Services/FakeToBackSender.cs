@@ -26,8 +26,8 @@ public class FakeToBackSender : IToBackSender
     public async Task<T?> GetData<T>(string path) =>
         typeof(T) switch
         {
-            var t when t == typeof(User) => await System.Threading.Tasks.Task.FromResult((T)(object)Users.ToList()).ConfigureAwait(false),
-            var t when t == typeof(TaskTracker.Models.Task) => await System.Threading.Tasks.Task.FromResult((T)(object)Tasks.ToList()).ConfigureAwait(false),
+            var t when t == typeof(User) => await System.Threading.Tasks.Task.FromResult((T)(object)Users.ToList().FirstOrDefault()).ConfigureAwait(false),
+            var t when t == typeof(TaskTracker.Models.Task) => await System.Threading.Tasks.Task.FromResult((T)(object)Tasks.ToList().FirstOrDefault()).ConfigureAwait(false),
             _ => await System.Threading.Tasks.Task.FromResult(default(T)).ConfigureAwait(false)
         };
 }
