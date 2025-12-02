@@ -19,7 +19,7 @@ services:
 
 
   postgres:
-    image: postgres:latest
+    image: postgres:18
     restart: always
     environment:
       POSTGRES_USER: your_username
@@ -34,7 +34,7 @@ services:
       retries: 10
       start_period: 10s
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql
     deploy:
       resources:
         limits:
