@@ -1,9 +1,10 @@
-﻿using System.Text.Json;
+﻿using System;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace TaskTracker.Services;
 
-public interface IToBackSender
+public interface IToBackSender : IDisposable
 {
     public Task<T?> GetData<T>(string path);
 

@@ -22,24 +22,24 @@ namespace TaskTracker.Localization {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class Resources {
+    internal class Errors {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Resources() {
+        internal Errors() {
         }
         
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Resources.ResourceManager ResourceManager {
+        internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("TaskTracker.Localization.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("TaskTracker.Localization.Errors", typeof(Errors).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -51,7 +51,7 @@ namespace TaskTracker.Localization {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Globalization.CultureInfo Culture {
+        internal static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -61,29 +61,20 @@ namespace TaskTracker.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to LogIn.
+        ///   Looks up a localized string similar to Path {0} is not configured..
         /// </summary>
-        public static string LogInTitle {
+        internal static string PathIsNotConfigured {
             get {
-                return ResourceManager.GetString("LogInTitle", resourceCulture);
+                return ResourceManager.GetString("PathIsNotConfigured", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Not Found.
+        ///   Looks up a localized string similar to ViewLocator is not initialized. Call ViewLocator.Initialize with a valid IServiceProvider before using..
         /// </summary>
-        public static string NotFound {
+        internal static string ViewLocatorNotInitialized {
             get {
-                return ResourceManager.GetString("NotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to SignUp.
-        /// </summary>
-        public static string SignUpTitle {
-            get {
-                return ResourceManager.GetString("SignUpTitle", resourceCulture);
+                return ResourceManager.GetString("ViewLocatorNotInitialized", resourceCulture);
             }
         }
     }

@@ -117,13 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="LogInTitle" xml:space="preserve">
-    <value>Войти</value>
+  <data name="PathIsNotConfigured" xml:space="preserve">
+    <value>Путь {0} не настроен.</value>
   </data>
-  <data name="NotFound" xml:space="preserve">
-    <value>Не найдено</value>
-  </data>
-  <data name="SignUpTitle" xml:space="preserve">
-    <value>Зарегистрироваться</value>
+  <data name="ViewLocatorNotInitialized" xml:space="preserve">
+    <value>ViewLocator не инициализирован. Перед использованием вызовите ViewLocator.Initialize с валидным IServiceProvider.</value>
   </data>
 </root>

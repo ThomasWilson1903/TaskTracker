@@ -45,4 +45,10 @@ internal class ToBackSender : IToBackSender
 
         return result;
     }
+
+    public void Dispose()
+    {
+        if (_httpClient is not null)
+            _httpClient.Dispose();
+    }
 }

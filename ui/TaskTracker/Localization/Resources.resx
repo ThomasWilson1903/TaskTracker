@@ -120,6 +120,9 @@
   <data name="LogInTitle" xml:space="preserve">
     <value>LogIn</value>
   </data>
+  <data name="NotFound" xml:space="preserve">
+    <value>Not Found</value>
+  </data>
   <data name="SignUpTitle" xml:space="preserve">
     <value>SignUp</value>
   </data>
