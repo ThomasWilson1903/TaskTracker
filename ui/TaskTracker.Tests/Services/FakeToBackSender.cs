@@ -6,8 +6,10 @@ namespace TaskTracker.Tests.Services;
 
 public class FakeToBackSender : IToBackSender
 {
-    public Collection<User> Users = new Collection<User>();
-    public Collection<TaskTracker.Models.Task> Tasks = new Collection<TaskTracker.Models.Task>();
+    private bool _disposed;
+
+    public Collection<User> Users { get; } = new Collection<User>();
+    public Collection<TaskTracker.Models.Task> Tasks { get; } = new Collection<TaskTracker.Models.Task>();
 
     public Task<T?> Post<T>(string path, T data)
     {
@@ -30,4 +32,24 @@ public class FakeToBackSender : IToBackSender
             var t when t == typeof(TaskTracker.Models.Task) => await System.Threading.Tasks.Task.FromResult((T)(object)Tasks.ToList().FirstOrDefault()).ConfigureAwait(false),
             _ => await System.Threading.Tasks.Task.FromResult(default(T)).ConfigureAwait(false)
         };
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed)
+            return;
+
+        if (disposing)
+        {
+            Users.Clear();
+            Tasks.Clear();
+        }
+        
+        _disposed = true;
+    }
 }
