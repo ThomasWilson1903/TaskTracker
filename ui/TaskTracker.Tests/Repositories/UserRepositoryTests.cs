@@ -1,4 +1,5 @@
-﻿using TaskTracker.Models;
+﻿using System.Threading.Tasks;
+using TaskTracker.Models;
 using TaskTracker.Repositories;
 using TaskTracker.Tests.Services;
 
@@ -28,5 +29,17 @@ public class UserRepositoryTests
         await repository.Create(user);
 
         Assert.NotNull(_backSender.Users.FirstOrDefault(u => u.Id == user.Id));
+    }
+
+    [Fact]
+    public async System.Threading.Tasks.Task RepositoryGetData()
+    {
+        var repository = new UserRepository(_backSender);
+        var user = new User();
+
+        await repository.Create(user);
+        var result = await repository.Get(user.Id);
+
+        Assert.Equal(user, result);
     }
 }
