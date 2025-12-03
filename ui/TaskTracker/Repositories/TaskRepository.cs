@@ -15,14 +15,25 @@ public class TaskRepository
         _context = context;
     }
 
-    public async System.Threading.Tasks.Task Create(Models.Task task)
+    public async System.Threading.Tasks.Task Create(Models.Task task, Guid userId)
     {
-        await _context.Post(Path, task).ConfigureAwait(false);
+        if (task is null)
+            return;
+
+        var data = new
+        {
+            UserId = userId,
+            Title = task.Title,
+            Description = task.Description,
+            Priority = task.Priority,
+            DueDate = task.DueDate
+        };
+        await _context.Post(Path, data).ConfigureAwait(false);
     }
 
     public async System.Threading.Tasks.Task<IEnumerable<Models.Task>?> GetAllByUserId(Guid userId)
     {
-        var path = $"{Path}?userId={userId.ToString()}";
+        var path = $"{Path}?user_id={userId.ToString()}";
         var tasks = await _context
             .GetData<IEnumerable<Models.Task>>(path)
             .ConfigureAwait(false);
