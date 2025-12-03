@@ -15,14 +15,14 @@ public class TaskRepository
         _context = context;
     }
 
-    public async System.Threading.Tasks.Task Create(Models.Task task, Guid userId)
+    public async System.Threading.Tasks.Task Create(Models.Task task)
     {
         if (task is null)
             return;
 
         var data = new
         {
-            UserId = userId,
+            UserId = task.UserId,
             Title = task.Title,
             Description = task.Description,
             Priority = task.Priority,
