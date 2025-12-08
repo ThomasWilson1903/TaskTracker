@@ -8,10 +8,10 @@
         x:Class="TaskTracker.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
         Title="TaskTracker"
-		TransparencyLevelHint="AcrylicBlur"
-		Background="Transparent"
-		ExtendClientAreaToDecorationsHint="True">
-	<Panel>
+		    TransparencyLevelHint="AcrylicBlur"
+		    Background="Transparent"
+		    ExtendClientAreaToDecorationsHint="True">
+	<Panel x:Name="MainPanel">
 		<ExperimentalAcrylicBorder IsHitTestVisible="False">
 			<ExperimentalAcrylicBorder.Material>
 				<ExperimentalAcrylicMaterial
@@ -21,6 +21,5 @@
 					MaterialOpacity="0.65" />
 			</ExperimentalAcrylicBorder.Material>
 		</ExperimentalAcrylicBorder>
-		<views:MainView />
 	</Panel>
 </Window>

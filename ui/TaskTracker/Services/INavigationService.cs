@@ -9,4 +9,6 @@ public interface INavigationService
     public event EventHandler<NavigationEventArgs> Navigated;
 
     public void NavigateTo(object content);
+
+    public void SetRoot(object root);
 }

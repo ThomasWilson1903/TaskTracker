@@ -1,16 +1,23 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
 using System.Linq;
 using Avalonia.Markup.Xaml;
 using TaskTracker.ViewModels;
 using TaskTracker.Views;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using TaskTracker.Services;
+using System;
 
 namespace TaskTracker;
 
 public partial class App : Application
 {
+    private static IHost _host = RegisterServices();
+
+    public static IServiceProvider Services = _host.Services;
+
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
@@ -18,21 +25,21 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
+        ConfigureRoutes(Services.GetRequiredService<IRouter>());
+        var vm = new MainViewModel(Services.GetRequiredService<IRouter>());
+
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 
             // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
             DisableAvaloniaDataAnnotationValidation();
-            desktop.MainWindow = new MainWindow
-            {
-                DataContext = new MainViewModel()
-            };
+            desktop.MainWindow = new MainWindow(vm);
         }
         else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
         {
-            singleViewPlatform.MainView = new MainView
+            singleViewPlatform.MainView = new MainView(Services.GetRequiredService<INavigationService>(), vm)
             {
-                DataContext = new MainViewModel()
+                DataContext = new MainViewModel(Services.GetRequiredService<IRouter>())
             };
         }
 
@@ -51,4 +58,20 @@ public partial class App : Application
             BindingPlugins.DataValidators.Remove(plugin);
         }
     }
+
+    private static IHost RegisterServices() =>
+        Host.CreateDefaultBuilder()
+        .ConfigureServices((context, services) =>
+        {
+            services.AddSingleton<INavigationService, NavigationService>();
+            services.AddSingleton<IRouter, Router>();
+        })
+        .Build();
+
+    private static void ConfigureRoutes(IRouter router) =>
+        router.ConfigureRoutes(configure =>
+        {
+            configure.AddRoute("/authorization", typeof(AuthorizationViewModel));
+            configure.AddRoute("/tasks", typeof(TaskListViewModel));
+        });
 }
