@@ -10,9 +10,9 @@ internal class ToBackSender : IToBackSender
     private readonly string _server;
     private readonly HttpClient _httpClient = new HttpClient();
 
-    public ToBackSender(string server)
+    public ToBackSender()
     {
-        _server = server;
+        _server = "http://localhost:8081";
     }
 
     public async Task<T?> GetData<T>(string path)

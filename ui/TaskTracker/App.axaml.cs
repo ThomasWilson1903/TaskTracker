@@ -9,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using TaskTracker.Services;
 using System;
+using TaskTracker.Repositories;
 
 namespace TaskTracker;
 
@@ -65,6 +66,9 @@ public partial class App : Application
         {
             services.AddSingleton<INavigationService, NavigationService>();
             services.AddSingleton<IRouter, Router>();
+            services.AddSingleton<IToBackSender, ToBackSender>();
+            services.AddSingleton<UserRepository>();
+            services.AddSingleton<TaskRepository>();
         })
         .Build();
 

@@ -23,9 +23,11 @@ public class ViewLocator : IDataTemplate
 
         if (type is not null)
         {
-            return parameters is not null && parameters.Length > 0
-                ? (Control)ActivatorUtilities.CreateInstance(App.Services, type, parameters)
-                : (Control)ActivatorUtilities.CreateInstance(App.Services, type);
+            var viewModel = parameters is not null && parameters.Length > 0
+            ? ActivatorUtilities.CreateInstance(App.Services, p, parameters)
+            : ActivatorUtilities.CreateInstance(App.Services, p);
+
+            return (UserControl)ActivatorUtilities.CreateInstance(App.Services, type, viewModel)!;
         }
 
         return new TextBlock { Text = $"{Localization.Resources.NotFound}: {name}" };
