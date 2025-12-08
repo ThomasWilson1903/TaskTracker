@@ -16,11 +16,17 @@
               VerticalAlignment="Center">
     <StackPanel IsVisible="{Binding NeedRegistration}">
       <Label Content="{x:Static lang:Resources.SignUpTitle}" />
-      <Label Content="{Binding Login}" />
-      <Label Content="{Binding Password}" />
+      <TextBox Text="{Binding Login}" />
+      <TextBox Text="{Binding Password}" />
+      <Button Content="{x:Static lang:Resources.SignUpTitle}"
+              Command="{Binding RegistrationCommand}" />
     </StackPanel>
     <StackPanel IsVisible="{Binding !NeedRegistration}">
       <Label Content="{x:Static lang:Resources.LogInTitle}" />
+      <TextBox Text="{Binding Login}" />
+      <TextBox Text="{Binding Password}" />
+      <Button Content="{x:Static lang:Resources.LogInTitle}"
+              Command="{Binding LogInCommand}" />
     </StackPanel>
   </StackPanel>
 </UserControl>

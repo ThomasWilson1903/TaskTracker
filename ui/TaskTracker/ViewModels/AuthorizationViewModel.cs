@@ -2,11 +2,13 @@
 using CommunityToolkit.Mvvm.Input;
 using TaskTracker.Models;
 using TaskTracker.Repositories;
+using TaskTracker.Services;
 
 namespace TaskTracker.ViewModels;
 
 public partial class AuthorizationViewModel : ViewModelBase
 {
+    private IRouter _router;
     private UserRepository _userRepository;
 
     [ObservableProperty]
@@ -27,8 +29,9 @@ public partial class AuthorizationViewModel : ViewModelBase
     [ObservableProperty]
     private bool _needRegistration = false;
 
-    public AuthorizationViewModel(UserRepository userRepository)
+    public AuthorizationViewModel(IRouter router,UserRepository userRepository)
     {
+        _router = router;
         _userRepository = userRepository;
     }
 
@@ -38,6 +41,9 @@ public partial class AuthorizationViewModel : ViewModelBase
         await System.Threading.Tasks.Task.CompletedTask.ConfigureAwait(false);
 
         CurrentUser = new User();
+
+        await _userRepository.Create(CurrentUser).ConfigureAwait(false);
+        NavigateToTasks();
     }
 
     [RelayCommand(AllowConcurrentExecutions = true)]
@@ -46,5 +52,12 @@ public partial class AuthorizationViewModel : ViewModelBase
         await System.Threading.Tasks.Task.CompletedTask.ConfigureAwait(false);
 
         CurrentUser = new User();
+        await _userRepository.Create(CurrentUser).ConfigureAwait(false);
+        NavigateToTasks();
+    }
+
+    private void NavigateToTasks()
+    {
+        _router.NavigateTo("/tasks");
     }
 }
