@@ -48,4 +48,10 @@ public class TaskRepository
 
         return task;
     }
+
+    public async System.Threading.Tasks.Task Delete(Guid taskId)
+    {
+        var path = $"{Path}?taskId={taskId.ToString()}";
+        //await _context.Delete()
+    }
 }

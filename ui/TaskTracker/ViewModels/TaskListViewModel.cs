@@ -12,7 +12,7 @@ public partial class TaskListViewModel : ViewModelBase
     private TaskRepository _repository;
     private User _currentUser;
 
-    ObservableCollection<TaskViewModel> Tasks { get; set; } = new ObservableCollection<TaskViewModel>();
+    public ObservableCollection<TaskViewModel> Tasks { get; } = new ObservableCollection<TaskViewModel>();
 
     public TaskListViewModel(TaskRepository repository, UserRepository userRepository)
     {
@@ -56,9 +56,18 @@ public partial class TaskListViewModel : ViewModelBase
         }
     }
 
-    [RelayCommand(AllowConcurrentExecutions = true)]
+    [RelayCommand]
     private async System.Threading.Tasks.Task CreateTask()
     {
         Tasks.Add(new TaskViewModel());
+    }
+
+    [RelayCommand]
+    private async System.Threading.Tasks.Task DeleteTask(TaskViewModel task)
+    {
+        Tasks.Remove(task);
+        var t = await _repository.GetById(task.Id).ConfigureAwait(false);
+        //if (t is not null)
+            //_repository.Delete(task.Id);
     }
 }
