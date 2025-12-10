@@ -1,6 +1,7 @@
 services:
   app:
-    image: thomaswilson1903/tasktracker:latest
+    build: ./
+    container_name: task-tracker
     environment:
       URL_DATA: jdbc:postgresql://postgres:5432/task_tracker
     ports:
@@ -16,7 +17,6 @@ services:
         reservations:
           cpus: 0.5
           memory: '512M'
-
 
   postgres:
     image: postgres:18
