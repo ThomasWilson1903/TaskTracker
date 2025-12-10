@@ -21,6 +21,7 @@ public class Consumer {
 
     @Column(unique = true, nullable = false)
     private String globalId;
+    @Column(unique = true, nullable = false)
     private String username;
     private String password;
     private String firstName;
@@ -28,6 +29,18 @@ public class Consumer {
 
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.EAGER)
     private List<Task> tasks;
+
+    public Consumer copy() {
+        return Consumer.builder()
+                .id(this.getId())
+                .globalId(this.getGlobalId())
+                .username(this.getUsername())
+                .password(this.getPassword())
+                .firstName(this.getFirstName())
+                .lastName(this.getLastName())
+                .tasks(this.getTasks())
+                .build();
+    }
 
     public Consumer addTask(Task task) {
         if (task == null) {
