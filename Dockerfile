@@ -2,8 +2,8 @@
 FROM maven:sapmachine AS builder
 WORKDIR /app
 # Копируем файлы проекта
-COPY ../pom.xml .
-COPY ../src ./src
+COPY ./pom.xml .
+COPY ./src ./src
 # Собираем проект
 RUN mvn clean install -DskipTests
 

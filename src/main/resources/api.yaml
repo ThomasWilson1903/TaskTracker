@@ -8,9 +8,110 @@ info:
 tags:
   - name: Tasks
     description: Операции с задачами
-  - name: Users
-    description: Управление пользователями
+  - name: Authentication
+    description: Регистрация и вход в систему
 paths:
+  /register:
+    post:
+      tags:
+        - Authentication
+      summary: Регистрация нового пользователя
+      security: []
+      description: Создает нового пользователя в системе
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+            example:
+              username: user123
+              password: SecurePass123!
+              firstName: John
+              lastName: Doe
+      responses:
+        '201':
+          description: Пользователь успешно создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+              example:
+                user:
+                  id: "550e8400-e29b-41d4-a716-446655440000"
+                  firstName: John
+                  lastName: Doe
+                  isActive: true
+                  createdAt: "2024-01-15T10:30:00Z"
+                  tokens: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        '400':
+          description: Неверные входные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Пользователь с таким username уже существует
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /login:
+    post:
+      tags:
+        - Authentication
+      summary: Вход в систему
+      security: []
+      description: Аутентификация пользователя и получение токенов
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            example:
+              username: exampleUsername
+              password: SecurePass123!
+      responses:
+        '200':
+          description: Успешный вход
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponseToken'
+        '400':
+          description: Неверные учетные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Неавторизован - неверный username или пароль
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Доступ запрещен - пользователь заблокирован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Слишком много попыток входа
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /tasks:
     get:
       tags:
@@ -136,7 +237,89 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Вставьте JWT токен в формате: `Bearer <token>`
+        Получить токен можно через `/login` или `/token` endpoints.
   schemas:
+    # ============ REQUEST SCHEMAS ============
+    RegisterRequest:
+      type: object
+      required:
+        - username
+        - password
+        - firstName
+        - lastName
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+          format: password
+          description: Пароль (мин. 8 символов)
+          minLength: 8
+          maxLength: 100
+          example: SecurePass123!
+        firstName:
+          type: string
+          description: Имя
+          minLength: 2
+          maxLength: 50
+          example: John
+        lastName:
+          type: string
+          description: Фамилия
+          minLength: 2
+          maxLength: 50
+          example: Doe
+    # ============ RESPONSE SCHEMAS ============
+    AuthResponseToken:
+      type: object
+      properties:
+        token:
+          type: string
+          description: Access токен для аутентификации запросов
+    AuthResponse:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/UserResponse'
+        token:
+          type: string
+          description: Access токен для аутентификации запросов
+
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Уникальный идентификатор пользователя
+        username:
+          type: string
+          description: username пользователя
+        firstName:
+          type: string
+          description: Имя
+        lastName:
+          type: string
+          description: Фамилия
+    LoginRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+          format: password
+          description: Пароль пользователя
+          example: SecurePass123!
     TaskNote:
       type: object
       required:
@@ -278,3 +461,5 @@ components:
           example:
             error: "internal_error"
             message: "Внутренняя ошибка сервера"
+security:
+  - BearerAuth: [ ]
