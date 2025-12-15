@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.twilson.tasktracker.entity.Consumer;
 import ru.twilson.tasktracker.repository.ConsumerRepository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -24,5 +25,11 @@ public class ConsumerService {
                 .findByUsername(username)
                 .map(consumer -> consumer.getPassword().equals(password))
                 .orElse(false);
+    }
+
+    public boolean isExists(String username) {
+        Optional<Consumer> byUsername = consumerRepository
+                .findByUsername(username);
+        return byUsername.isPresent();
     }
 }
