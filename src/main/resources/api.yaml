@@ -35,14 +35,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthResponse'
-              example:
-                user:
-                  id: "550e8400-e29b-41d4-a716-446655440000"
-                  firstName: John
-                  lastName: Doe
-                  isActive: true
-                  createdAt: "2024-01-15T10:30:00Z"
-                  tokens: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
         '400':
           description: Неверные входные данные
           content:
@@ -267,6 +259,8 @@ components:
         token:
           type: string
           description: Access токен для аутентификации запросов
+        user:
+          $ref: '#/components/schemas/UserResponse'
     AuthResponse:
       type: object
       properties:
@@ -285,12 +279,6 @@ components:
         username:
           type: string
           description: username пользователя
-        firstName:
-          type: string
-          description: Имя
-        lastName:
-          type: string
-          description: Фамилия
     LoginRequest:
       type: object
       required:

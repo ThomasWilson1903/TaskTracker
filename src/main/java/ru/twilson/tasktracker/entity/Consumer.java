@@ -42,6 +42,18 @@ public class Consumer {
                 .build();
     }
 
+    public Consumer copyPasswordEmpty() {
+        return Consumer.builder()
+                .id(this.getId())
+                .globalId(this.getGlobalId())
+                .username(this.getUsername())
+                .password(this.getPassword())
+                .firstName(this.getFirstName())
+                .lastName(this.getLastName())
+                .tasks(this.getTasks())
+                .build();
+    }
+
     public Consumer addTask(Task task) {
         if (task == null) {
             return this;
