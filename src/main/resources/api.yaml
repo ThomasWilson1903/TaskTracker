@@ -28,8 +28,6 @@ paths:
             example:
               username: user123
               password: SecurePass123!
-              firstName: John
-              lastName: Doe
       responses:
         '201':
           description: Пользователь успешно создан
@@ -252,8 +250,6 @@ components:
       required:
         - username
         - password
-        - firstName
-        - lastName
       properties:
         username:
           type: string
@@ -264,18 +260,6 @@ components:
           minLength: 8
           maxLength: 100
           example: SecurePass123!
-        firstName:
-          type: string
-          description: Имя
-          minLength: 2
-          maxLength: 50
-          example: John
-        lastName:
-          type: string
-          description: Фамилия
-          minLength: 2
-          maxLength: 50
-          example: Doe
     # ============ RESPONSE SCHEMAS ============
     AuthResponseToken:
       type: object
