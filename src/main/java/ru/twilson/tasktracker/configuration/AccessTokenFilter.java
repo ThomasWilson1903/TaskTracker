@@ -18,7 +18,7 @@ import java.util.ArrayList;
 
 @Component
 @RequiredArgsConstructor
-public class JwtTokenFilter extends OncePerRequestFilter {
+public class AccessTokenFilter extends OncePerRequestFilter {
 
     private final JwtTokenUtil jwtTokenUtil;
     private final ConsumerService consumerService;
@@ -33,9 +33,10 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         try {
             if (token != null) {
-
                 String username = jwtTokenUtil.extractUsername(token);
-                if (consumerService.isExists(username) && jwtTokenUtil.validateToken(token)) {
+                if (jwtTokenUtil.validateToken(token)
+                        && consumerService.isExists(username)) {
+                    consumerService.isEnable(username);
                     UsernamePasswordAuthenticationToken authentication =
                             new UsernamePasswordAuthenticationToken(
                                     username,
@@ -51,7 +52,6 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT token");
             return;
         }
-
         filterChain.doFilter(request, response);
     }
 

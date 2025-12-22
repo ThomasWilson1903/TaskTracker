@@ -35,6 +35,7 @@ public class AuthController implements AuthenticationApi {
 
     @Override
     public ResponseEntity<AuthResponseToken> loginUser(LoginRequest loginRequest) {
+        consumerService.isEnable(loginRequest.getUsername());
         Consumer consumer = consumerService.findConsumer(loginRequest.getUsername(), loginRequest.getPassword());
         return new ResponseEntity<>(new AuthResponseToken()
                 .token(

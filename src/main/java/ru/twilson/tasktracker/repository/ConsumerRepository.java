@@ -14,4 +14,6 @@ public interface ConsumerRepository extends JpaRepository<Consumer, Long> {
     Optional<Consumer> findByUsername(String username);
 
     Optional<Consumer> findByUsernameAndPassword(String username, String password);
+
+    boolean existsByUsername(String username);
 }

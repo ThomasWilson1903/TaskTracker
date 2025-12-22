@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -16,19 +17,19 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtTokenFilter jwtTokenFilter;
+    private final AccessTokenFilter accessTokenFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .securityContext(securityContext -> securityContext.disable())
-                .exceptionHandling(exceptionHandling -> exceptionHandling.disable())
-                .rememberMe(rememberMe -> rememberMe.disable())
-                .httpBasic(httpBasic -> httpBasic.disable())  // Отключаем Basic Auth
-                .formLogin(formLogin -> formLogin.disable())  // Отключаем форму логина
-                .logout(logout -> logout.disable())           // Отключаем logout
-                .rememberMe(rememberMe -> rememberMe.disable()) // Отключаем remember me
-                .csrf(csrf -> csrf.disable())
+                .exceptionHandling(AbstractHttpConfigurer::disable)
+                .securityContext(AbstractHttpConfigurer::disable)
+                .rememberMe(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)  // Отключаем Basic Auth
+                .formLogin(AbstractHttpConfigurer::disable)  // Отключаем форму логина
+                .logout(AbstractHttpConfigurer::disable)           // Отключаем logout
+                .rememberMe(AbstractHttpConfigurer::disable) // Отключаем remember me
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/login",
@@ -44,7 +45,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(accessTokenFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 }
