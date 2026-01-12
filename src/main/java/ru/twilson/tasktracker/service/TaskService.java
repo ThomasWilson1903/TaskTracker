@@ -1,6 +1,10 @@
 package ru.twilson.tasktracker.service;
 
 import jakarta.transaction.Transactional;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import lombok.*;
 import jakarta.persistence.EntityNotFoundException;
@@ -37,8 +41,8 @@ public class TaskService {
         if (consumerGlobalId == null) {
             throw new NullPointerException("consumerGlobalId is null");
         }
-        Consumer consumer = consumerRepository.findByGlobalId(
-                consumerGlobalId).orElseThrow(() -> new EntityNotFoundException("Consumer not found"));
+        Consumer consumer = getConsumer(consumerGlobalId);
+        checkAccess(consumer.getUsername());
         return consumer.getTasks().stream().map(Task::copy).toList();
     }
 
@@ -47,22 +51,15 @@ public class TaskService {
         if (consumerGlobalId == null || taskTemplate == null) {
             throw new NullPointerException("null");
         }
+        Consumer consumer = getConsumer(consumerGlobalId);
+        checkAccess(consumer.getUsername());
         Task task = taskTemplate.copy();
-        Optional<Consumer> consumerOptional = consumerRepository.findByGlobalId(consumerGlobalId);
         task.setTaskGlobalId(UUID.randomUUID().toString());
         task.setCreatedAt(Instant.now().toString());
         task.setUpdatedAt(Instant.now().toString());
         task.setStatus("pending");
-        Consumer consumer;
-        if (consumerOptional.isEmpty()) {
-            consumer = Consumer.builder().globalId(consumerGlobalId).build();
-            task.setConsumer(consumer);
-            consumer.addTask(task);
-        } else {
-            consumer = consumerOptional.get();
-            task.setConsumer(consumer);
-            consumer.addTask(task);
-        }
+        task.setConsumer(consumer);
+        consumer.addTask(task);
         consumerRepository.save(consumer);
         applicationEventPublisher.publishEvent(new EventNotification(this, consumerGlobalId, formatTask(task)));
         return task;
@@ -72,6 +69,8 @@ public class TaskService {
     public Task update(Task task) {
         Task taskEntity = taskRepository.findByTaskGlobalId(task.getTaskGlobalId()).orElseThrow(() ->
                 new EntityNotFoundException("Task not found"));
+        Consumer consumer = taskEntity.getConsumer();
+        checkAccess(consumer.getUsername());
         String notification = TaskFormatterUtils.update(taskEntity, task);
         taskEntity.setUpdatedAt(Instant.now().toString());
         taskEntity.setTitle(task.getTitle() == null ? taskEntity.getTitle() : task.getTitle());
@@ -92,8 +91,22 @@ public class TaskService {
         Optional<Task> byTaskGlobalId = taskRepository.findByTaskGlobalId(taskGlobalId);
         if (byTaskGlobalId.isEmpty()) return;
         Task task = byTaskGlobalId.get();
-        Consumer consumer = task.getConsumer().removeTask(taskGlobalId);
-        consumerRepository.saveAndFlush(consumer);
-        applicationEventPublisher.publishEvent(new EventNotification(this, consumer.getGlobalId(), String.format("Задача была удалена [%s]", task.getTitle())));
+        checkAccess(task.getConsumer().getUsername());
+        task.setDeleted(true);
+        taskRepository.saveAndFlush(task);
+        applicationEventPublisher.publishEvent(new EventNotification(this, task.getConsumer().getGlobalId(), String.format("Задача была удалена [%s]", task.getTitle())));
+    }
+
+    private Consumer getConsumer(String consumerGlobalId) {
+        return consumerRepository.findByGlobalId(
+                consumerGlobalId).orElseThrow(() -> new EntityNotFoundException("Consumer not found"));
+    }
+
+    private void checkAccess(String username) {
+        SecurityContext context = SecurityContextHolder.getContext();
+        Authentication authentication = context.getAuthentication();
+        if (!authentication.getName().equals(username)) {
+            throw new AccessDeniedException("Access denied");
+        }
     }
 }
