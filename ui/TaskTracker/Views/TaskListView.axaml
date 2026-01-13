@@ -12,6 +12,8 @@
   </Design.DataContext>
 
   <StackPanel Orientation="Vertical">
+    <Button Content="{x:Static lang:Resources.CreateButton}"
+            Command="{Binding CreateTaskCommand}"/>
     <ListBox ItemsSource="{Binding Tasks}">
       <ListBox.ItemTemplate>
         <DataTemplate>

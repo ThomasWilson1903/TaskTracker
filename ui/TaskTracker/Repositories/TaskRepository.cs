@@ -1,21 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using TaskTracker.Services;
 
 namespace TaskTracker.Repositories;
 
 public class TaskRepository
 {
-    private readonly IToBackSender _context;
+    private readonly IRequestProvider _context;
     private const string Path = "/tasks";
 
-    public TaskRepository(IToBackSender context)
+    public TaskRepository(IRequestProvider context)
     {
         _context = context;
     }
 
-    public async System.Threading.Tasks.Task Create(Models.Task task)
+    public async System.Threading.Tasks.Task CreateAsync(Models.Task task)
     {
         if (task is null)
             return;
@@ -28,30 +27,30 @@ public class TaskRepository
             Priority = task.Priority,
             DueDate = task.DueDate
         };
-        await _context.Post(Path, data).ConfigureAwait(false);
+        await _context.PostAsync<object, Models.Task>(Path, data).ConfigureAwait(false);
     }
 
-    public async System.Threading.Tasks.Task<IEnumerable<Models.Task>?> GetAllByUserId(Guid userId)
+    public async System.Threading.Tasks.Task<IEnumerable<Models.Task>?> GetAllByUserIdAsync(Guid userId)
     {
         var path = $"{Path}?user_id={userId.ToString()}";
         var tasks = await _context
-            .GetData<IEnumerable<Models.Task>>(path)
+            .GetAsync<IEnumerable<Models.Task>>(path)
             .ConfigureAwait(false);
 
         return tasks;
     }
 
-    public async System.Threading.Tasks.Task<Models.Task?> GetById(Guid taskId)
+    public async System.Threading.Tasks.Task<Models.Task?> GetByIdAsync(Guid taskId)
     {
-        var path = $"{Path}?taskId={taskId.ToString()}";
-        var task = await _context.GetData<Models.Task>(path).ConfigureAwait(false);
+        var path = $"{Path}/{taskId.ToString()}";
+        var task = await _context.GetAsync<Models.Task>(path).ConfigureAwait(false);
 
         return task;
     }
 
-    public async System.Threading.Tasks.Task Delete(Guid taskId)
+    public async System.Threading.Tasks.Task DeleteAsync(Guid taskId)
     {
-        var path = $"{Path}?taskId={taskId.ToString()}";
-        //await _context.Delete()
+        var path = $"{Path}/{taskId.ToString()}";
+        await _context.DeleteAsync(path).ConfigureAwait(false);
     }
 }

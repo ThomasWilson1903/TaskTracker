@@ -66,7 +66,7 @@ public partial class App : Application
         {
             services.AddSingleton<INavigationService, NavigationService>();
             services.AddSingleton<IRouter, Router>();
-            services.AddSingleton<IToBackSender, ToBackSender>();
+            services.AddSingleton<IRequestProvider, RequestProvider>();
             services.AddSingleton<UserRepository>();
             services.AddSingleton<TaskRepository>();
         })
