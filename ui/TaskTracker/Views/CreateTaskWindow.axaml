@@ -1,0 +1,23 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="TaskTracker.CreateTaskWindow"
+        Title="CreateTaskWindow">
+  <StackPanel Orientation="Vertical">
+    <Label Content="Title" />
+    <TextBox x:Name="Title" />
+    <Label Content="Description" />
+    <TextBox x:Name="Description" />
+    <StackPanel Orientation="Horizontal">
+      <DatePicker x:Name="DueDatePicker" />
+      <TimePicker x:Name="DueTimePicker" />
+    </StackPanel>
+
+    <StackPanel Orientation="Horizontal">
+      <Button Content="Save" Click="SaveButton_Click" />
+      <Button Content="Cancel" Click="CancelButton_Click" />
+    </StackPanel>
+  </StackPanel>
+</Window>

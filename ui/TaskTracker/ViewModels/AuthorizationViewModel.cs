@@ -42,7 +42,7 @@ public partial class AuthorizationViewModel : ViewModelBase
 
         CurrentUser = new User();
 
-        await _userRepository.Create(CurrentUser).ConfigureAwait(false);
+        await _userRepository.LoginAsync(CurrentUser).ConfigureAwait(false);
         NavigateToTasks();
     }
 
@@ -52,7 +52,7 @@ public partial class AuthorizationViewModel : ViewModelBase
         await System.Threading.Tasks.Task.CompletedTask.ConfigureAwait(false);
 
         CurrentUser = new User();
-        await _userRepository.Create(CurrentUser).ConfigureAwait(false);
+        await _userRepository.RegisterAsync(CurrentUser).ConfigureAwait(false);
         NavigateToTasks();
     }
 

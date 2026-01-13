@@ -2,7 +2,28 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:TaskTracker.ViewModels"
+             xmlns:lang="using:TaskTracker.Localization"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="TaskTracker.Views.TaskListView">
-  Welcome to Avalonia!
+             x:Class="TaskTracker.Views.TaskListView"
+             x:DataType="vm:TaskListViewModel">
+  <Design.DataContext>
+    <vm:TaskListViewModel />
+  </Design.DataContext>
+
+  <StackPanel Orientation="Vertical">
+    <Button Content="{x:Static lang:Resources.CreateButton}"
+            Command="{Binding CreateTaskCommand}"/>
+    <ListBox ItemsSource="{Binding Tasks}">
+      <ListBox.ItemTemplate>
+        <DataTemplate>
+          <StackPanel Orientation="Horizontal">
+            <Label Content="{Binding Title}" />
+            <Button Content="{x:Static lang:Resources.DeleteButton}"
+                    Click="DeleteButton_Click" />
+          </StackPanel>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+  </StackPanel>
 </UserControl>
