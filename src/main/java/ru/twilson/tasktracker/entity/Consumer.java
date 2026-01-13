@@ -27,7 +27,10 @@ public class Consumer {
     private String firstName;
     private String lastName;
 
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.EAGER)
+    @Column(nullable = false)
+    private boolean enable;
+
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.LAZY)
     private List<Task> tasks;
 
     public Consumer copy() {
@@ -39,6 +42,20 @@ public class Consumer {
                 .firstName(this.getFirstName())
                 .lastName(this.getLastName())
                 .tasks(this.getTasks())
+                .enable(this.isEnable())
+                .build();
+    }
+
+    public Consumer copyPasswordEmpty() {
+        return Consumer.builder()
+                .id(this.getId())
+                .globalId(this.getGlobalId())
+                .username(this.getUsername())
+                .password(this.getPassword())
+                .firstName(this.getFirstName())
+                .lastName(this.getLastName())
+                .tasks(this.getTasks())
+                .enable(this.isEnable())
                 .build();
     }
 

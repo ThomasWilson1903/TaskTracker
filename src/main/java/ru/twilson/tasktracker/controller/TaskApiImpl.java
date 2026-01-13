@@ -1,15 +1,20 @@
 package ru.twilson.tasktracker.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import ru.twilson.tasktracker.api.TasksApi;
 import ru.twilson.tasktracker.entity.Task;
 import ru.twilson.tasktracker.model.*;
+import ru.twilson.tasktracker.model.Error;
 import ru.twilson.tasktracker.service.TaskService;
 import ru.twilson.tasktracker.utils.TaskMapper;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class TaskApiImpl implements TasksApi {
@@ -45,4 +50,9 @@ public class TaskApiImpl implements TasksApi {
         return new ResponseEntity<>(mapper.toTaskNote(service.update(task)), HttpStatus.OK);
     }
 
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Error> accessDeniedResponse(AccessDeniedException exception) {
+        log.info(exception.getMessage());
+        return new ResponseEntity<>(new Error("запрещено", exception.getMessage()), HttpStatus.FORBIDDEN);
+    }
 }

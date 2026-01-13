@@ -3,9 +3,6 @@ package ru.twilson.tasktracker.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.Instant;
-import java.util.UUID;
-
 @Getter
 @Setter
 @Entity
@@ -29,6 +26,7 @@ public class Task {
     private String updatedAt;
     private String completedAt;
     private String status;
+    private boolean isDeleted = false;
 
     @ManyToOne(cascade = CascadeType.ALL)
     private Consumer consumer;
@@ -49,17 +47,6 @@ public class Task {
                 .updatedAt(updatedAt)
                 .completedAt(completedAt)
                 .status(status)
-                .consumer(consumer)
-                .executor(executor)
-                .build();
-    }
-
-    public Task createNewFromTemplate(String consumerGlobalId, Consumer consumer) {
-        return this.toBuilder()
-                .taskGlobalId(UUID.randomUUID().toString())
-                .createdAt(Instant.now().toString())
-                .updatedAt(Instant.now().toString())
-                .status("pending")
                 .consumer(consumer)
                 .build();
     }

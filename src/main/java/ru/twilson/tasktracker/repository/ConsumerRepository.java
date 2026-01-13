@@ -12,4 +12,8 @@ public interface ConsumerRepository extends JpaRepository<Consumer, Long> {
     Optional<Consumer> findByGlobalId(String globalId);
 
     Optional<Consumer> findByUsername(String username);
+
+    Optional<Consumer> findByUsernameAndPassword(String username, String password);
+
+    boolean existsByUsername(String username);
 }
