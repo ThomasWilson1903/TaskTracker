@@ -40,7 +40,7 @@ public partial class AuthorizationViewModel : ViewModelBase
     {
         await System.Threading.Tasks.Task.CompletedTask.ConfigureAwait(false);
 
-        CurrentUser = new User();
+        CurrentUser = new User() { Username = Login, Password = Password };
 
         await _userRepository.LoginAsync(CurrentUser).ConfigureAwait(false);
         NavigateToTasks();
