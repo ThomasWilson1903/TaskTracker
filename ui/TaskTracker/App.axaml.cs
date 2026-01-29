@@ -10,6 +10,8 @@ using Microsoft.Extensions.DependencyInjection;
 using TaskTracker.Services;
 using System;
 using TaskTracker.Repositories;
+using TaskTracker.Database;
+using Microsoft.EntityFrameworkCore;
 
 namespace TaskTracker;
 
@@ -66,7 +68,11 @@ public partial class App : Application
         {
             services.AddSingleton<INavigationService, NavigationService>();
             services.AddSingleton<IRouter, Router>();
+#if DEBUG
+            services.AddDbContext<AppDbContext>(opt => opt.UseInMemoryDatabase("TaskTracker"));
+#else
             services.AddSingleton<IRequestProvider, RequestProvider>();
+#endif
             services.AddSingleton<UserRepository>();
             services.AddSingleton<TaskRepository>();
         })
