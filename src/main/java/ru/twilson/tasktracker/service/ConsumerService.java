@@ -52,4 +52,11 @@ public class ConsumerService {
                 .orElseThrow(() -> new EntityNotFoundException("Consumer not found"));
         return consumer.copyPasswordEmpty();
     }
+
+    public Consumer findConsumer(String username) {
+        Consumer consumer = consumerRepository
+                .findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("Consumer not found"));
+        return consumer.copyPasswordEmpty();
+    }
 }

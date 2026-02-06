@@ -8,6 +8,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import ru.twilson.tasktracker.api.TasksApi;
+import ru.twilson.tasktracker.configuration.RequestStorage;
 import ru.twilson.tasktracker.entity.Task;
 import ru.twilson.tasktracker.model.*;
 import ru.twilson.tasktracker.model.Error;
@@ -21,15 +22,16 @@ public class TaskApiImpl implements TasksApi {
 
     private final TaskMapper mapper;
     private final TaskService service;
+    private final RequestStorage requestStorage;
 
     @Override
-    public ResponseEntity<TasksGet200Response> tasksGet(String userId) {
-        return new ResponseEntity<>(new TasksGet200Response().data(mapper.toTaskNotes(service.getTaskByIdConsumer(userId))), HttpStatus.OK);
+    public ResponseEntity<TasksGet200Response> tasksGet() {
+        return new ResponseEntity<>(new TasksGet200Response().data(mapper.toTaskNotes(service.getTaskByIdConsumer(requestStorage.getUserGlobalId()))), HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<TaskNote> tasksPost(CreateTaskRequest createTaskRequest) {
-        return new ResponseEntity<>(mapper.toTaskNote(service.add(createTaskRequest.getUserId(), mapper.toTask(createTaskRequest))), HttpStatus.OK);
+        return new ResponseEntity<>(mapper.toTaskNote(service.add(requestStorage.getUserGlobalId(), mapper.toTask(createTaskRequest))), HttpStatus.OK);
     }
 
     @Override

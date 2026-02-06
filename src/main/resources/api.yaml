@@ -108,12 +108,6 @@ paths:
         - Tasks
       summary: Получить список задач
       description: Возвращает список задач с поддержкой пагинации и фильтрации
-      parameters:
-        - name: user_id
-          in: query
-          description: user_id
-          schema:
-            type: string
       responses:
         '200':
           description: Успешный запрос
@@ -336,11 +330,7 @@ components:
       type: object
       required:
         - title
-        - user_id
       properties:
-        user_id:
-          type: string
-          maxLength: 255
         title:
           type: string
           maxLength: 255

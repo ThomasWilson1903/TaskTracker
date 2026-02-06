@@ -21,6 +21,7 @@ import java.util.ArrayList;
 public class AccessTokenFilter extends OncePerRequestFilter {
 
     private final JwtTokenUtil jwtTokenUtil;
+    private final RequestStorage requestStorage;
     private final ConsumerService consumerService;
 
     @Override
@@ -43,7 +44,7 @@ public class AccessTokenFilter extends OncePerRequestFilter {
                                     null,
                                     new ArrayList<>()
                             );
-
+                    requestStorage.setUserGlobalId(consumerService.findConsumer(username).getGlobalId());
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }
