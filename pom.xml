@@ -172,7 +172,6 @@
                                 <basePackage>ru.twilson.tasktracker</basePackage>
                                 <configPackage>ru.twilson.tasktracker.config</configPackage>
                             </configOptions>
-                            <output>${project.build.directory}/generated-sources/openapi</output>
                         </configuration>
                     </execution>
                 </executions>
