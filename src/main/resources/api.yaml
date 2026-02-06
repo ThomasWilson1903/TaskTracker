@@ -16,7 +16,7 @@ paths:
       tags:
         - Authentication
       summary: Регистрация нового пользователя
-      security: []
+      security: [ ]
       description: Создает нового пользователя в системе
       operationId: registerUser
       requestBody:
@@ -59,7 +59,7 @@ paths:
       tags:
         - Authentication
       summary: Вход в систему
-      security: []
+      security: [ ]
       description: Аутентификация пользователя и получение токенов
       operationId: loginUser
       requestBody:
@@ -325,6 +325,15 @@ components:
         completed_at:
           type: string
           description: Дата завершения задачи
+        executor:
+          type: object
+          properties:
+            id:
+              type: string
+              description: Уникальный идентификатор пользователя
+            username:
+              type: string
+              description: username пользователя
 
     CreateTaskRequest:
       type: object
@@ -340,6 +349,8 @@ components:
         priority:
           type: string
         due_date:
+          type: string
+        executorGlobalId:
           type: string
 
     UpdateTaskRequest:
@@ -357,6 +368,15 @@ components:
           type: string
         due_date:
           type: string
+        executor:
+          type: object
+          properties:
+            id:
+              type: string
+              description: Уникальный идентификатор пользователя
+            username:
+              type: string
+              description: username пользователя
 
     Error:
       type: object

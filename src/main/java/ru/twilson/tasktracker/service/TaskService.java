@@ -47,20 +47,22 @@ public class TaskService {
     }
 
     @Transactional
-    public Task add(String consumerGlobalId, Task taskTemplate) {
+    public Task add(String consumerGlobalId, String executorGlobalId, Task taskTemplate) {
         if (consumerGlobalId == null || taskTemplate == null) {
             throw new NullPointerException("null");
         }
-        Consumer consumer = getConsumer(consumerGlobalId);
-        checkAccess(consumer.getUsername());
+        Consumer creator = getConsumer(consumerGlobalId);
+        Consumer executor = executorGlobalId == null ? creator : getConsumer(executorGlobalId);
+        checkAccess(creator.getUsername());
         Task task = taskTemplate.copy();
         task.setTaskGlobalId(UUID.randomUUID().toString());
         task.setCreatedAt(Instant.now().toString());
         task.setUpdatedAt(Instant.now().toString());
         task.setStatus("pending");
-        task.setConsumer(consumer);
-        consumer.addTask(task);
-        consumerRepository.save(consumer);
+        task.setCreator(creator);
+        task.setExecutor(executor);
+        creator.addTask(task);
+        consumerRepository.save(creator);
         applicationEventPublisher.publishEvent(new EventNotification(this, consumerGlobalId, formatTask(task)));
         return task;
     }
@@ -69,7 +71,7 @@ public class TaskService {
     public Task update(Task task) {
         Task taskEntity = taskRepository.findByTaskGlobalId(task.getTaskGlobalId()).orElseThrow(() ->
                 new EntityNotFoundException("Task not found"));
-        Consumer consumer = taskEntity.getConsumer();
+        Consumer consumer = taskEntity.getCreator();
         checkAccess(consumer.getUsername());
         String notification = TaskFormatterUtils.update(taskEntity, task);
         taskEntity.setUpdatedAt(Instant.now().toString());
@@ -79,9 +81,14 @@ public class TaskService {
         taskEntity.setDueDate(task.getDueDate() == null ? taskEntity.getDueDate() : task.getDueDate());
         taskEntity.setStatus(task.getStatus() == null ? taskEntity.getStatus() : task.getStatus());
         taskEntity.setCreatedAt(task.getCreatedAt() == null ? taskEntity.getCreatedAt() : task.getCreatedAt());
-        taskEntity.setConsumer(task.getConsumer() == null ? taskEntity.getConsumer() : task.getConsumer());
+        taskEntity.setCreator(task.getCreator() == null ? taskEntity.getCreator() : task.getCreator());
         taskEntity.setCompletedAt("completed".equals(task.getStatus()) ? Instant.now().toString() : null);
-        applicationEventPublisher.publishEvent(new EventNotification(this, taskEntity.getConsumer().getGlobalId(), notification));
+        if (task.getExecutor() == null) {
+            taskEntity.setExecutor(taskEntity.getExecutor());
+        } else {
+            taskEntity.setExecutor(getConsumer(task.getExecutor().getGlobalId()));
+        }
+        applicationEventPublisher.publishEvent(new EventNotification(this, taskEntity.getCreator().getGlobalId(), notification));
         return taskEntity.copy();
     }
 
@@ -91,10 +98,10 @@ public class TaskService {
         Optional<Task> byTaskGlobalId = taskRepository.findByTaskGlobalId(taskGlobalId);
         if (byTaskGlobalId.isEmpty()) return;
         Task task = byTaskGlobalId.get();
-        checkAccess(task.getConsumer().getUsername());
+        checkAccess(task.getCreator().getUsername());
         task.setDeleted(true);
         taskRepository.saveAndFlush(task);
-        applicationEventPublisher.publishEvent(new EventNotification(this, task.getConsumer().getGlobalId(), String.format("Задача была удалена [%s]", task.getTitle())));
+        applicationEventPublisher.publishEvent(new EventNotification(this, task.getCreator().getGlobalId(), String.format("Задача была удалена [%s]", task.getTitle())));
     }
 
     private Consumer getConsumer(String consumerGlobalId) {

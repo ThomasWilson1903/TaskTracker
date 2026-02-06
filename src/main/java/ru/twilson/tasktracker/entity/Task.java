@@ -29,7 +29,7 @@ public class Task {
     private boolean isDeleted = false;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    private Consumer consumer;
+    private Consumer creator;
 
     @ManyToOne(cascade = CascadeType.ALL)
     private Consumer executor;
@@ -47,7 +47,8 @@ public class Task {
                 .updatedAt(updatedAt)
                 .completedAt(completedAt)
                 .status(status)
-                .consumer(consumer)
+                .creator(creator)
+                .executor(executor)
                 .build();
     }
 }

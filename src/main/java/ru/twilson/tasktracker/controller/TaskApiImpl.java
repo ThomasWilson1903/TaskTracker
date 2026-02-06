@@ -31,7 +31,10 @@ public class TaskApiImpl implements TasksApi {
 
     @Override
     public ResponseEntity<TaskNote> tasksPost(CreateTaskRequest createTaskRequest) {
-        return new ResponseEntity<>(mapper.toTaskNote(service.add(requestStorage.getUserGlobalId(), mapper.toTask(createTaskRequest))), HttpStatus.OK);
+        return new ResponseEntity<>(mapper.toTaskNote(service.add(requestStorage.getUserGlobalId(),
+                createTaskRequest.getExecutorGlobalId(),
+                mapper.toTask(createTaskRequest))),
+                HttpStatus.OK);
     }
 
     @Override
